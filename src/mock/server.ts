@@ -1,0 +1,247 @@
+import { createServer, Model, Factory, Response } from 'miragejs';
+import { User, Item } from '@/types';
+
+export function makeServer() {
+  return createServer({
+    models: {
+      user: Model.extend<Partial<User>>({}),
+      item: Model.extend<Partial<Item>>({}),
+    },
+
+    factories: {
+      user: Factory.extend({
+        name(i: number) {
+          const firstNames = [
+            'John', 'Jane', 'Michael', 'Sarah', 'David', 'Emma', 'Robert', 'Lisa',
+            'William', 'Maria', 'James', 'Jennifer', 'Christopher', 'Linda', 'Daniel',
+            'Patricia', 'Matthew', 'Barbara', 'Andrew', 'Susan', 'Joshua', 'Jessica',
+            'Ryan', 'Nancy', 'Brian', 'Karen', 'Kevin', 'Betty', 'Jason', 'Helen',
+            'Thomas', 'Sandra', 'Joseph', 'Donna', 'Charles', 'Carol', 'Steven', 'Ruth',
+            'Paul', 'Sharon', 'Mark', 'Michelle', 'Donald', 'Laura', 'George', 'Sarah',
+            'Kenneth', 'Kimberly', 'Steven', 'Deborah'
+          ];
+          const lastNames = [
+            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+            'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
+            'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson',
+            'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson'
+          ];
+          return `${firstNames[i % firstNames.length]} ${lastNames[Math.floor(i / 2) % lastNames.length]}`;
+        },
+        email(i: number) {
+          const firstNames = [
+            'john', 'jane', 'michael', 'sarah', 'david', 'emma', 'robert', 'lisa',
+            'william', 'maria', 'james', 'jennifer', 'christopher', 'linda', 'daniel',
+            'patricia', 'matthew', 'barbara', 'andrew', 'susan', 'joshua', 'jessica',
+            'ryan', 'nancy', 'brian', 'karen', 'kevin', 'betty', 'jason', 'helen',
+            'thomas', 'sandra', 'joseph', 'donna', 'charles', 'carol', 'steven', 'ruth',
+            'paul', 'sharon', 'mark', 'michelle', 'donald', 'laura', 'george', 'sarah',
+            'kenneth', 'kimberly', 'steven', 'deborah'
+          ];
+          const lastNames = [
+            'smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis',
+            'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson',
+            'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson',
+            'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson'
+          ];
+          return `${firstNames[i % firstNames.length]}.${lastNames[Math.floor(i / 2) % lastNames.length]}@company.com`;
+        },
+        role(i: number) {
+          // First 5 users are admins, rest are reviewers
+          return i < 5 ? 'admin' : 'reviewer';
+        },
+      }),
+
+      item: Factory.extend({
+        name(i: number) {
+          const items = [
+            'Dell XPS 15 Laptop',
+            'LG UltraWide Monitor 34"',
+            'Mechanical Keyboard RGB',
+            'Logitech MX Master Mouse',
+            'Standing Desk Electric',
+            'Ergonomic Office Chair',
+            'HP LaserJet Printer',
+            'Canon Document Scanner',
+            'MacBook Pro 16"',
+            'Samsung Curved Monitor',
+            'Wireless Keyboard',
+            'Trackpad Magic',
+            'Adjustable Desk Riser',
+            'Executive Leather Chair',
+            'Brother Color Printer',
+            'Epson Receipt Scanner',
+            'ThinkPad T14 Laptop',
+            'BenQ Designer Monitor',
+            'Gaming Keyboard',
+            'Vertical Ergonomic Mouse',
+            'Bamboo Standing Desk',
+            'Mesh Back Office Chair',
+            'Multifunction Printer',
+            'Portable Scanner',
+            'Surface Laptop Studio',
+            'ASUS ProArt Display',
+            'Compact Keyboard',
+            'Bluetooth Mouse',
+            'Corner L-Desk',
+            'Task Chair with Arms',
+            'Inkjet All-in-One',
+            'Sheetfed Scanner',
+            'HP EliteBook Laptop',
+            'Ultrawide Gaming Monitor',
+            'Split Ergonomic Keyboard',
+            'Travel Mouse Wireless',
+            'Height Adjustable Desk',
+            'Conference Room Chair',
+            'Laser Printer Color',
+            'High-Speed Scanner',
+            'Lenovo Yoga Laptop',
+            'Dell UltraSharp Monitor',
+            'Backlit Keyboard',
+            'Precision Mouse',
+            'Executive Office Desk',
+            'Visitor Chair Set',
+            'Network Printer',
+            'Flatbed Scanner',
+            'ASUS VivoBook',
+            'AOC Gaming Monitor'
+          ];
+          return items[i % items.length];
+        },
+        category(i: number) {
+          const categories = [
+            'Laptops',
+            'Monitors',
+            'Input Devices',
+            'Input Devices',
+            'Furniture',
+            'Furniture',
+            'Printers',
+            'Scanners',
+            'Laptops',
+            'Monitors',
+            'Input Devices',
+            'Input Devices',
+            'Furniture',
+            'Furniture',
+            'Printers',
+            'Scanners'
+          ];
+          return categories[i % categories.length];
+        },
+        status(i: number) {
+          const statuses: Array<'active' | 'inactive' | 'pending'> = ['active', 'active', 'active', 'inactive', 'pending'];
+          return statuses[i % statuses.length];
+        },
+        createdAt(i: number) {
+          const date = new Date();
+          date.setDate(date.getDate() - (i * 7)); // Each item created 7 days apart
+          return date.toISOString();
+        },
+      }),
+    },
+
+    seeds(server) {
+      server.createList('user', 50);
+      server.createList('item', 80);
+    },
+
+    routes() {
+      this.namespace = 'api';
+      this.timing = 500;
+
+      // Users endpoints
+      this.get('/users', (schema, request) => {
+        const { page = '0', pageSize = '10', search = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        let users = schema.all('user').models;
+
+        if (search) {
+          const searchLower = String(search).toLowerCase();
+          users = users.filter(
+            (user: any) =>
+              user.name.toLowerCase().includes(searchLower) ||
+              user.email.toLowerCase().includes(searchLower)
+          );
+        }
+
+        const total = users.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginatedUsers = users.slice(start, end);
+
+        return {
+          data: paginatedUsers,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.get('/users/:id', (schema, request) => {
+        const id = request.params.id;
+        return schema.find('user', id);
+      });
+
+      this.post('/users', (schema, request) => {
+        const attrs = JSON.parse(request.requestBody);
+        return schema.create('user', attrs);
+      });
+
+      this.put('/users/:id', (schema, request) => {
+        const id = request.params.id;
+        const attrs = JSON.parse(request.requestBody);
+        const user = schema.find('user', id);
+        if (!user) {
+          return new Response(404);
+        }
+        user.update(attrs);
+        return user;
+      });
+
+      this.delete('/users/:id', (schema, request) => {
+        const id = request.params.id;
+        const user = schema.find('user', id);
+        user?.destroy();
+        return new Response(204);
+      });
+
+      // Items endpoints
+      this.get('/items', (schema, request) => {
+        const { page = '0', pageSize = '10', search = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        let items = schema.all('item').models;
+
+        if (search) {
+          const searchLower = String(search).toLowerCase();
+          items = items.filter(
+            (item: any) =>
+              item.name.toLowerCase().includes(searchLower) ||
+              item.category.toLowerCase().includes(searchLower)
+          );
+        }
+
+        const total = items.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginatedItems = items.slice(start, end);
+
+        return {
+          data: paginatedItems,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.get('/items/:id', (schema, request) => {
+        const id = request.params.id;
+        return schema.find('item', id);
+      });
+    },
+  });
+}
