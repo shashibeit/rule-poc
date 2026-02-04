@@ -150,6 +150,52 @@ export function makeServer() {
       this.namespace = 'api';
       this.timing = 500;
 
+      // User report endpoints
+      this.get('/reports/user-logins', (schema, request) => {
+        const { page = '0', pageSize = '10', search = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        let users = schema.all('user').models;
+
+        if (search) {
+          const searchLower = String(search).toLowerCase();
+          users = users.filter(
+            (user: any) =>
+              user.name.toLowerCase().includes(searchLower) ||
+              user.email.toLowerCase().includes(searchLower) ||
+              String(user.role).toLowerCase().includes(searchLower)
+          );
+        }
+
+        const total = users.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginatedUsers = users.slice(start, end);
+
+        const data = paginatedUsers.map((user: any, index: number) => {
+          const date = new Date();
+          const daysAgo = (pageNum * pageSizeNum) + index + 1;
+          date.setDate(date.getDate() - daysAgo);
+          date.setHours(9 + (index % 9), (index * 7) % 60);
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            lastLogin: date.toISOString(),
+          };
+        });
+
+        return {
+          data,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
       // Users endpoints
       this.get('/users', (schema, request) => {
         const { page = '0', pageSize = '10', search = '' } = request.queryParams;

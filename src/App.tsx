@@ -9,6 +9,7 @@ import { LoginPage } from './features/auth/LoginPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PageSkeleton } from './pages/PageSkeleton';
+import { UserReportPage } from './pages/UserReportPage';
 
 function App() {
   return (
@@ -139,7 +140,7 @@ function App() {
               path="user-report"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="User Report" />
+                  <UserReportPage />
                 </RoleGuard>
               }
             />

@@ -15,6 +15,14 @@ export interface Item {
   createdAt: string;
 }
 
+export interface UserReportRecord {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  lastLogin: string;
+}
+
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
