@@ -23,6 +23,15 @@ export interface UserReportRecord {
   lastLogin: string;
 }
 
+export interface RuleChangeRecord {
+  id: string;
+  ruleCategory: string;
+  ruleSet: string;
+  ruleName: string;
+  ruleMode: string;
+  compare: string;
+}
+
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;

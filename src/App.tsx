@@ -10,6 +10,9 @@ import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PageSkeleton } from './pages/PageSkeleton';
 import { UserReportPage } from './pages/UserReportPage';
+import { ViewRuleChangesPage } from './pages/ViewRuleChangesPage';
+import { RefreshStagingPage } from './pages/RefreshStagingPage';
+import { WelcomePage } from './pages/WelcomePage';
 
 function App() {
   return (
@@ -29,11 +32,13 @@ function App() {
           >
             <Route path="unauthorized" element={<UnauthorizedPage />} />
 
+            <Route index element={<WelcomePage />} />
+
             <Route
               path="refresh-staging"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Refresh Staging" />
+                  <RefreshStagingPage />
                 </RoleGuard>
               }
             />
@@ -41,7 +46,7 @@ function App() {
               path="view-rule-changes"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="View Rule Changes" />
+                  <ViewRuleChangesPage />
                 </RoleGuard>
               }
             />
@@ -227,7 +232,6 @@ function App() {
               }
             />
 
-            <Route index element={<Navigate to="refresh-staging" replace />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/login" replace />} />

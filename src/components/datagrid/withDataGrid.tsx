@@ -1,11 +1,13 @@
-import { ComponentType, ReactNode } from 'react';
+import { ComponentType, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DataGrid,
   GridColDef,
   GridRowsProp,
   GridPaginationModel,
+  GridFooterContainer,
+  GridPagination,
 } from '@mui/x-data-grid';
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, TextField, Typography } from '@mui/material';
 
 export interface DataGridViewProps {
   rows: GridRowsProp;
@@ -19,6 +21,7 @@ export interface DataGridViewProps {
   getRowId?: (row: any) => string | number;
   height?: number | string;
   toolbar?: ReactNode;
+  showPageJump?: boolean;
 }
 
 export const withDataGrid = <P extends object>(
@@ -39,8 +42,22 @@ export const withDataGrid = <P extends object>(
       getRowId,
       height = 'auto',
       toolbar,
+      showPageJump = false,
       ...rest
     } = props;
+
+    const totalPages = useMemo(() => {
+      if (!rowCount || rowCount <= 0) {
+        return 1;
+      }
+      return Math.max(1, Math.ceil(rowCount / pageSize));
+    }, [rowCount, pageSize]);
+
+    const [pageInput, setPageInput] = useState(String(page + 1));
+
+    useEffect(() => {
+      setPageInput(String(page + 1));
+    }, [page]);
 
     const handlePaginationModelChange = (model: GridPaginationModel) => {
       if (model.page !== page) {
@@ -50,6 +67,71 @@ export const withDataGrid = <P extends object>(
         onPageSizeChange(model.pageSize);
       }
     };
+
+    const Footer = useCallback(() => (
+      <GridFooterContainer
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 1,
+          gap: 2,
+        }}
+      >
+        <GridPagination />
+        {showPageJump && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Go to page
+            </Typography>
+            <TextField
+              value={pageInput}
+              onChange={(e) => {
+                const raw = e.target.value;
+                if (raw === '') {
+                  setPageInput('');
+                  return;
+                }
+                if (!/^[0-9]+$/.test(raw)) {
+                  return;
+                }
+                setPageInput(raw);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const next = Number(pageInput);
+                  if (Number.isFinite(next)) {
+                    const clamped = Math.min(Math.max(1, next), totalPages);
+                    onPageChange(clamped - 1);
+                  } else {
+                    setPageInput(String(page + 1));
+                  }
+                }
+              }}
+              onBlur={() => {
+                const next = Number(pageInput);
+                if (pageInput === '') {
+                  setPageInput(String(page + 1));
+                  return;
+                }
+                if (Number.isFinite(next)) {
+                  const clamped = Math.min(Math.max(1, next), totalPages);
+                  onPageChange(clamped - 1);
+                }
+              }}
+              size="small"
+              sx={{ width: 90 }}
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              of {totalPages}
+            </Typography>
+          </Box>
+        )}
+      </GridFooterContainer>
+    ), [pageInput, showPageJump, totalPages, onPageChange, page]);
+
+    const slots = useMemo(() => ({ footer: Footer }), [Footer]);
 
     return (
       <Box>
@@ -76,10 +158,24 @@ export const withDataGrid = <P extends object>(
               onPaginationModelChange={handlePaginationModelChange}
               getRowId={getRowId}
               disableRowSelectionOnClick
+              slots={slots}
               sx={{
                 border: 'none',
                 height: '100%',
                 bgcolor: 'background.paper',
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: (theme) => theme.palette.grey[300],
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  fontWeight: 700,
+                  color: 'text.primary',
+                },
+                '& .MuiDataGrid-sortIcon': {
+                  color: 'text.primary',
+                },
+                '& .MuiDataGrid-menuIconButton': {
+                  color: 'text.primary',
+                },
                 '& .MuiDataGrid-virtualScroller': {
                   bgcolor: 'background.paper',
                 },

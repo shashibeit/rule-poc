@@ -17,7 +17,7 @@ export const LoginPage: FC = () => {
     };
 
     dispatch(login(user));
-    navigate('/app/refresh-staging');
+    navigate('/app');
   };
 
   return (

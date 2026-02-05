@@ -196,6 +196,71 @@ export function makeServer() {
         };
       });
 
+      // Rule changes report
+      this.get('/reports/rule-changes', (_schema, request) => {
+        const { page = '0', pageSize = '10', search = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const ruleNames = [
+          'Daily Spend Limit',
+          'MCC Block',
+          'Geo Velocity',
+          'High Risk Country',
+          'PIN Retry Limit',
+          'Offline Amount Cap',
+          'Merchant Category Allow',
+          'Card Present Required',
+          'International Usage',
+          'Transaction Amount Range',
+        ];
+        const ruleModes = ['Enabled', 'Disabled', 'Monitor'];
+        const compareValues = ['Changed', 'Unchanged', 'Added', 'Removed'];
+
+        const totalRecords = 60;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          return {
+            id: String(i + 1),
+            ruleCategory: categories[i % categories.length],
+            ruleSet: ruleSets[i % ruleSets.length],
+            ruleName: ruleNames[i % ruleNames.length],
+            ruleMode: ruleModes[i % ruleModes.length],
+            compare: compareValues[i % compareValues.length],
+          };
+        });
+
+        if (search) {
+          const searchLower = String(search).toLowerCase();
+          data = data.filter((row) =>
+            [row.ruleCategory, row.ruleSet, row.ruleName, row.ruleMode, row.compare]
+              .join(' ')
+              .toLowerCase()
+              .includes(searchLower)
+          );
+        }
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.post('/reports/refresh-staging', () => {
+        return {
+          success: true,
+          message: 'Staging refresh is completed successfully',
+        };
+      });
+
       // Users endpoints
       this.get('/users', (schema, request) => {
         const { page = '0', pageSize = '10', search = '' } = request.queryParams;
