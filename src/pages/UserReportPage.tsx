@@ -37,7 +37,7 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <TextField
             fullWidth
             size="small"
@@ -48,7 +48,7 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -59,7 +59,7 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
             helperText={errors.portfolioName}
           />
         </Grid>
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search

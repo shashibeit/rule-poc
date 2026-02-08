@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 
@@ -27,7 +27,7 @@ const QueuesAssignedHeader: FC<QueuesAssignedHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -38,7 +38,7 @@ const QueuesAssignedHeader: FC<QueuesAssignedHeaderProps> = ({
             helperText={error}
           />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search

@@ -7,8 +7,8 @@ import {
   Box,
   Button,
   CircularProgress,
-  Grid,
   Chip,
+  Grid,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -89,21 +89,21 @@ export const ItemDetailPage: FC = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Item ID
             </Typography>
             <Typography variant="body1">{selectedItem.id}</Typography>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Category
             </Typography>
             <Typography variant="body1">{selectedItem.category}</Typography>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Status
             </Typography>
@@ -112,7 +112,7 @@ export const ItemDetailPage: FC = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Created At
             </Typography>

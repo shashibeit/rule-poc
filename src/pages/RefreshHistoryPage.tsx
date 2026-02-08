@@ -29,7 +29,7 @@ const OperationHistoryHeader: FC<OperationHistoryHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -46,7 +46,7 @@ const OperationHistoryHeader: FC<OperationHistoryHeaderProps> = ({
             <MenuItem value="Rule_Schedule">Rule Schedule</MenuItem>
           </TextField>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search

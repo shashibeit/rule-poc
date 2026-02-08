@@ -7,8 +7,8 @@ import {
   RadioGroup,
   TextField,
   Typography,
-  Grid,
 } from '@mui/material';
+import { Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 
@@ -58,7 +58,7 @@ const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
 
       <Grid container spacing={2} alignItems="center">
         {mode === 'single' ? (
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField
               fullWidth
               size="small"
@@ -70,7 +70,7 @@ const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
             />
           </Grid>
         ) : (
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Button variant="outlined" component="label">
                 Search By Tokenized PAN Details
@@ -92,7 +92,7 @@ const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
             </Box>
           </Grid>
         )}
-        <Grid item xs={12} md={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <Button variant="contained" onClick={onSearch}>
             Search
           </Button>

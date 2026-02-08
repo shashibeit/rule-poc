@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Box, Button, Grid, Typography, Alert } from '@mui/material';
+import { Box, Button, Typography, Alert, Grid } from '@mui/material';
 
 export const UploadRuleSchedulerPage: FC = () => {
   const [fileName, setFileName] = useState('');
@@ -15,7 +15,7 @@ export const UploadRuleSchedulerPage: FC = () => {
       </Alert>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Button variant="outlined" component="label">
               Choose File
@@ -34,7 +34,7 @@ export const UploadRuleSchedulerPage: FC = () => {
             </Button>
           </Box>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {fileName && (
             <Typography variant="body2" color="text.secondary">
               {fileName}

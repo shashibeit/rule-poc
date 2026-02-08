@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { Alert, Box, Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -43,7 +43,7 @@ const RuleCountHeader: FC<RuleCountHeaderProps> = ({
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <DatePicker
               label="Date"
               value={date}
@@ -58,7 +58,7 @@ const RuleCountHeader: FC<RuleCountHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               select
               fullWidth
@@ -74,7 +74,7 @@ const RuleCountHeader: FC<RuleCountHeaderProps> = ({
               <MenuItem value="Emergency">Emergency</MenuItem>
             </TextField>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button variant="contained" onClick={onSearch}>
                 Search

@@ -3,12 +3,12 @@ import {
   Box,
   Button,
   FormControlLabel,
-  Grid,
   Radio,
   RadioGroup,
   TextField,
   Typography,
 } from '@mui/material';
+import { Grid } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -183,7 +183,7 @@ export const FiHotlistCheckPage: FC = () => {
 
       {mode === 'single' && (
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               size="small"
@@ -194,12 +194,12 @@ export const FiHotlistCheckPage: FC = () => {
               helperText={errors.clientId}
             />
           </Grid>
-          <Grid item xs={12} md={1}>
+          <Grid size={{ xs: 12, md: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
               OR
             </Typography>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               size="small"
@@ -210,7 +210,7 @@ export const FiHotlistCheckPage: FC = () => {
               helperText={errors.portfolioName}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button variant="contained" onClick={handleSearchSingle}>
                 Search
@@ -225,7 +225,7 @@ export const FiHotlistCheckPage: FC = () => {
 
       {mode === 'multiple' && (
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Button variant="outlined" component="label">
                 Search By Client ID or Portfolio Name Details
@@ -251,7 +251,7 @@ export const FiHotlistCheckPage: FC = () => {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <Button variant="contained" onClick={handleSearchMultiple}>
               Search
             </Button>
@@ -262,7 +262,7 @@ export const FiHotlistCheckPage: FC = () => {
       {mode === 'date' && (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -273,12 +273,12 @@ export const FiHotlistCheckPage: FC = () => {
                 helperText={errors.clientId}
               />
             </Grid>
-            <Grid item xs={12} md={1}>
+            <Grid size={{ xs: 12, md: 1 }}>
               <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
                 OR
               </Typography>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -289,7 +289,7 @@ export const FiHotlistCheckPage: FC = () => {
                 helperText={errors.portfolioName}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <DatePicker
                 label="Date"
                 value={date}
@@ -304,7 +304,7 @@ export const FiHotlistCheckPage: FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <Button variant="contained" onClick={handleSearchByDate}>
                 Search
               </Button>

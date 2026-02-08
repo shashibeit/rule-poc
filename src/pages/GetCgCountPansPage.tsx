@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 
@@ -34,7 +34,7 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -45,7 +45,7 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
             helperText={error}
           />
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <Button variant="contained" onClick={onSearch}>
             Search
           </Button>

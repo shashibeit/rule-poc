@@ -3,13 +3,13 @@ import {
   Box,
   Button,
   FormControlLabel,
-  Grid,
   MenuItem,
   Radio,
   RadioGroup,
   TextField,
   Typography,
 } from '@mui/material';
+import { Grid } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
@@ -98,7 +98,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
         <Grid container spacing={2} alignItems="center">
           {mode === 'fi' && (
             <>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   select
                   fullWidth
@@ -114,7 +114,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
                   <MenuItem value="THGL_PROTECTBUY_FI">THGL_PROTECTBUY_FI</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -130,7 +130,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
 
           {mode === 'emergency' && (
             <>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   select
                   fullWidth
@@ -146,7 +146,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
                   <MenuItem value="EMERGENCY_BLOCK">EMERGENCY_BLOCK</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -157,7 +157,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
                   helperText={errors.keyEmergencyRule}
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -173,7 +173,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
 
           {mode === 'risky' && (
             <>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   select
                   fullWidth
@@ -189,7 +189,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
                   <MenuItem value="RISKY_ALERT">RISKY_ALERT</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -200,7 +200,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
                   helperText={errors.keyRuleName}
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -214,7 +214,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
             </>
           )}
 
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               size="small"
@@ -223,7 +223,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
               onChange={(e) => onPortfolioNameChange(e.target.value)}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               size="small"
@@ -232,7 +232,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
               onChange={(e) => onUserNameChange(e.target.value)}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <DatePicker
               label="From Date"
               value={fromDate}
@@ -245,7 +245,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <DatePicker
               label="To Date"
               value={toDate}
@@ -258,7 +258,7 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button variant="contained" onClick={onSearch}>
                 Search

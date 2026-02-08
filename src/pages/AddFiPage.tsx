@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Box, Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, MenuItem, TextField, Typography, Grid } from '@mui/material';
 
 const DEBIT_PROTECT_SERVICE_OPTIONS = [
   'Custom Alerting',
@@ -72,7 +72,7 @@ export const AddFiPage: FC = () => {
       </Typography>
 
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -83,7 +83,7 @@ export const AddFiPage: FC = () => {
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -94,7 +94,7 @@ export const AddFiPage: FC = () => {
             helperText={errors.portfolioName}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -105,7 +105,7 @@ export const AddFiPage: FC = () => {
             helperText={errors.acro}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -116,7 +116,7 @@ export const AddFiPage: FC = () => {
             helperText={errors.salesforceFiName}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -134,7 +134,7 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -152,7 +152,7 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -170,7 +170,7 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -188,7 +188,7 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
             fullWidth
@@ -206,7 +206,7 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <TextField
             fullWidth
             size="small"
@@ -223,7 +223,7 @@ export const AddFiPage: FC = () => {
             helperText={`${serviceComments.length}/400`}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={handleSubmit}>
               Submit

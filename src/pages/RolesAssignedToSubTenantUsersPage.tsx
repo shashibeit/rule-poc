@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 
@@ -29,7 +29,7 @@ const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <TextField
             fullWidth
             size="small"
@@ -40,12 +40,12 @@ const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid item xs={12} md={1}>
+        <Grid size={{ xs: 12, md: 1 }}>
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
             OR
           </Typography>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <TextField
             fullWidth
             size="small"
@@ -56,7 +56,7 @@ const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
             helperText={errors.userName}
           />
         </Grid>
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search

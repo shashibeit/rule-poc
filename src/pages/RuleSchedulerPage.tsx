@@ -7,8 +7,8 @@ import {
   MenuItem,
   Alert,
   Button,
-  Grid,
 } from '@mui/material';
+import { Grid } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { GridColDef } from '@mui/x-data-grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -61,7 +61,7 @@ const RuleSchedulerHeader: FC<RuleSchedulerHeaderProps> = ({
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <DatePicker
               label="Start Date"
               value={startDate}
@@ -76,7 +76,7 @@ const RuleSchedulerHeader: FC<RuleSchedulerHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <DatePicker
               label="End Date"
               value={endDate}
@@ -89,7 +89,7 @@ const RuleSchedulerHeader: FC<RuleSchedulerHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <TextField
               select
               fullWidth
@@ -103,12 +103,12 @@ const RuleSchedulerHeader: FC<RuleSchedulerHeaderProps> = ({
               <MenuItem value="Emergency">Emergency</MenuItem>
             </TextField>
           </Grid>
-          <Grid item xs={12} md={1}>
+          <Grid size={{ xs: 12, md: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
               OR
             </Typography>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               size="small"
@@ -126,7 +126,7 @@ const RuleSchedulerHeader: FC<RuleSchedulerHeaderProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button variant="contained" onClick={onApply}>
                 Search

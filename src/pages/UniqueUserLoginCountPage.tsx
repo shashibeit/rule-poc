@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography ,Grid} from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -37,7 +37,7 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <TextField
             fullWidth
             size="small"
@@ -48,7 +48,7 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             fullWidth
             size="small"
@@ -59,7 +59,7 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
             helperText={errors.portfolioName}
           />
         </Grid>
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search

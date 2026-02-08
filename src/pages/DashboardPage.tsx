@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Container, Paper, Typography, Grid, Box } from '@mui/material';
+import { Container, Paper, Typography, Box, Grid } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -45,7 +45,7 @@ export const DashboardPage: FC = () => {
         {stats
           .filter((stat) => stat.show)
           .map((stat, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
               <Paper
                 sx={{
                   p: 3,
