@@ -140,13 +140,26 @@ export const withDataGrid = <P extends object>(
           sx={{
             mt: 2,
             height,
+            width: '100%',
+            maxWidth: '100%',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
+            minWidth: 0,
           }}
         >
           {toolbar && <Box sx={{ px: 2, pt: 2 }}>{toolbar}</Box>}
-          <Box sx={{ flexGrow: 1, px: 2, py: 2, minHeight: 0 }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              px: 2,
+              py: 2,
+              minHeight: 0,
+              minWidth: 0,
+              maxWidth: '100%',
+              overflowX: 'auto',
+            }}
+          >
             <DataGrid
               rows={rows}
               columns={columns}
@@ -162,6 +175,8 @@ export const withDataGrid = <P extends object>(
               sx={{
                 border: 'none',
                 height: '100%',
+                width: '100%',
+                maxWidth: '100%',
                 bgcolor: 'background.paper',
                 '& .MuiDataGrid-columnHeaders': {
                   backgroundColor: (theme) => theme.palette.grey[300],
@@ -181,6 +196,13 @@ export const withDataGrid = <P extends object>(
                 },
                 '& .MuiDataGrid-footerContainer': {
                   bgcolor: 'background.paper',
+                },
+                '& .MuiDataGrid-main': {
+                  overflowX: 'auto',
+                },
+                '& .MuiDataGrid-virtualScrollerContent': {
+                  width: 'max-content',
+                  minWidth: '100%',
                 },
               }}
             />

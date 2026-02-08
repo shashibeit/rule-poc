@@ -22,13 +22,24 @@ const initialState: UserReportState = {
   },
 };
 
-export const fetchUserReport = createAsyncThunk(
-  'reports/fetchUserReport',
-  async (params: { page: number; pageSize: number; search: string }) => {
+export const fetchUserReportAll = createAsyncThunk(
+  'reports/fetchUserReportAll',
+  async (params: { page: number; pageSize: number }) => {
     const response = await apiClient.get<{
       data: UserReportRecord[];
       total: number;
-    }>('/reports/user-logins', params);
+    }>('/reports/user-report', params);
+    return response;
+  }
+);
+
+export const fetchUserReportSearch = createAsyncThunk(
+  'reports/fetchUserReportSearch',
+  async (params: { page: number; pageSize: number; clientId?: string; portfolioName?: string }) => {
+    const response = await apiClient.post<{
+      data: UserReportRecord[];
+      total: number;
+    }>('/reports/user-report/search', params);
     return response;
   }
 );
@@ -43,16 +54,29 @@ const userReportSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserReport.pending, (state) => {
+      .addCase(fetchUserReportAll.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserReport.fulfilled, (state, action) => {
+      .addCase(fetchUserReportAll.fulfilled, (state, action) => {
         state.loading = false;
         state.records = action.payload.data;
         state.total = action.payload.total;
       })
-      .addCase(fetchUserReport.rejected, (state, action) => {
+      .addCase(fetchUserReportAll.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to load user report';
+      })
+      .addCase(fetchUserReportSearch.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserReportSearch.fulfilled, (state, action) => {
+        state.loading = false;
+        state.records = action.payload.data;
+        state.total = action.payload.total;
+      })
+      .addCase(fetchUserReportSearch.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load user report';
       });

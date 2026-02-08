@@ -102,9 +102,11 @@ export const SideNav: FC<SideNavProps> = ({ open, onClose, variant = 'permanent'
   };
 
   const drawerContent = (
-    <Box>
-      <Toolbar />
-      <List>{menuConfig.map((item) => renderMenuItem(item))}</List>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Toolbar sx={{ minHeight: 120 }} />
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        <List>{menuConfig.map((item) => renderMenuItem(item))}</List>
+      </Box>
     </Box>
   );
 
@@ -122,6 +124,9 @@ export const SideNav: FC<SideNavProps> = ({ open, onClose, variant = 'permanent'
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: DRAWER_WIDTH,
+            mt: '50px',
+            height: 'calc(100vh - 50px)',
+            overflow: 'hidden',
           },
         }}
       >
@@ -140,6 +145,9 @@ export const SideNav: FC<SideNavProps> = ({ open, onClose, variant = 'permanent'
         '& .MuiDrawer-paper': {
           width: DRAWER_WIDTH,
           boxSizing: 'border-box',
+          mt: '50px',
+          height: 'calc(100vh - 50px)',
+          overflow: 'hidden',
         },
       }}
     >

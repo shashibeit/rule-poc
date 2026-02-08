@@ -62,7 +62,7 @@ export const ProfilePage: FC = () => {
           value={form.values.name}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
-          error={form.errors.name}
+          errorMessage={form.errors.name}
           touched={form.touched.name}
           margin="normal"
         />
@@ -74,7 +74,7 @@ export const ProfilePage: FC = () => {
           value={form.values.email}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
-          error={form.errors.email}
+          errorMessage={form.errors.email}
           touched={form.touched.email}
           margin="normal"
         />

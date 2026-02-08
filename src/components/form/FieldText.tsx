@@ -1,12 +1,12 @@
 import { ChangeEvent, FocusEvent, FC } from 'react';
 import { TextField, TextFieldProps } from '@mui/material';
 
-export interface FieldTextProps extends Omit<TextFieldProps, 'name' | 'value' | 'onChange' | 'onBlur'> {
+export interface FieldTextProps extends Omit<TextFieldProps, 'name' | 'value' | 'onChange' | 'onBlur' | 'error'> {
   name: string;
   value: any;
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  error?: string;
+  errorMessage?: string;
   touched?: boolean;
 }
 
@@ -15,12 +15,12 @@ export const FieldText: FC<FieldTextProps> = ({
   value,
   onChange,
   onBlur,
-  error,
+  errorMessage,
   touched,
   helperText,
   ...rest
 }) => {
-  const showError = touched && !!error;
+  const showError = touched && !!errorMessage;
 
   return (
     <TextField
@@ -29,7 +29,7 @@ export const FieldText: FC<FieldTextProps> = ({
       onChange={onChange}
       onBlur={onBlur}
       error={showError}
-      helperText={showError ? error : helperText}
+      helperText={showError ? errorMessage : helperText}
       fullWidth
       {...rest}
     />

@@ -89,7 +89,7 @@ export const UserDialog: FC<UserDialogProps> = ({
           value={form.values.name}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
-          error={form.errors.name}
+          errorMessage={form.errors.name}
           touched={form.touched.name}
           margin="normal"
           autoFocus
@@ -102,7 +102,7 @@ export const UserDialog: FC<UserDialogProps> = ({
           value={form.values.email}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
-          error={form.errors.email}
+          errorMessage={form.errors.email}
           touched={form.touched.email}
           margin="normal"
         />
@@ -114,7 +114,7 @@ export const UserDialog: FC<UserDialogProps> = ({
           value={form.values.role}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
-          error={form.errors.role}
+          errorMessage={form.errors.role}
           touched={form.touched.role}
           margin="normal"
         >

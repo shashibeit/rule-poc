@@ -196,6 +196,233 @@ export function makeServer() {
         };
       });
 
+      this.get('/reports/user-report', (_schema, request) => {
+        const { page = '0', pageSize = '10' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const users = [
+          { userId: '1001', fullName: 'John Smith', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1002', fullName: 'Jane Johnson', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
+        ];
+        const ops = ['Staging Refreshed', 'Pruduction Refreshed', 'Rule Schedule'];
+
+        const totalRecords = 80;
+        const data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setMinutes(created.getMinutes() - i * 10);
+          const user = users[i % users.length];
+
+          return {
+            id: String(i + 1),
+            userId: user.userId,
+            fullName: user.fullName,
+            operationType: ops[i % ops.length],
+            createdAt: created.toISOString(),
+            clientId: user.clientId,
+            portfolioName: user.portfolioName,
+          };
+        });
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.post('/reports/user-report/search', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { page = 0, pageSize = 10, clientId = '', portfolioName = '' } = body;
+
+        const users = [
+          { userId: '1001', fullName: 'John Smith', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1002', fullName: 'Jane Johnson', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
+        ];
+        const ops = ['Staging Refreshed', 'Pruduction Refreshed', 'Rule Schedule'];
+
+        let data = Array.from({ length: 80 }, (_v, i) => {
+          const created = new Date();
+          created.setMinutes(created.getMinutes() - i * 10);
+          const user = users[i % users.length];
+
+          return {
+            id: String(i + 1),
+            userId: user.userId,
+            fullName: user.fullName,
+            operationType: ops[i % ops.length],
+            createdAt: created.toISOString(),
+            clientId: user.clientId,
+            portfolioName: user.portfolioName,
+          };
+        });
+
+        if (clientId) {
+          data = data.filter((row) => row.clientId === String(clientId));
+        }
+
+        if (portfolioName) {
+          const lower = String(portfolioName).toLowerCase();
+          data = data.filter((row) => row.portfolioName.toLowerCase().includes(lower));
+        }
+
+        const total = data.length;
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page,
+          pageSize,
+        };
+      });
+
+      this.get('/reports/unique-user-logins', (_schema, request) => {
+        const { page = '0', pageSize = '10' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const clients = [
+          { clientId: '1001', portfolioName: 'Alpha' },
+          { clientId: '1002', portfolioName: 'Beta' },
+          { clientId: '1003', portfolioName: 'Gamma' },
+        ];
+
+        const totalRecords = 60;
+        const data = Array.from({ length: totalRecords }, (_v, i) => {
+          const client = clients[i % clients.length];
+          const hour = (i % 24).toString().padStart(2, '0');
+          return {
+            id: String(i + 1),
+            time: `${hour}:00`,
+            day6: (i + 6) % 50,
+            day5a: (i + 5) % 50,
+            day5b: (i + 15) % 50,
+            day4: (i + 4) % 50,
+            day3: (i + 3) % 50,
+            day2: (i + 2) % 50,
+            day1: (i + 1) % 50,
+            day0: i % 50,
+            clientId: client.clientId,
+            portfolioName: client.portfolioName,
+          };
+        });
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.post('/reports/unique-user-logins/search', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { page = 0, pageSize = 10, clientId = '', portfolioName = '' } = body;
+
+        const clients = [
+          { clientId: '1001', portfolioName: 'Alpha' },
+          { clientId: '1002', portfolioName: 'Beta' },
+          { clientId: '1003', portfolioName: 'Gamma' },
+        ];
+
+        let data = Array.from({ length: 60 }, (_v, i) => {
+          const client = clients[i % clients.length];
+          const hour = (i % 24).toString().padStart(2, '0');
+          return {
+            id: String(i + 1),
+            time: `${hour}:00`,
+            day6: (i + 6) % 50,
+            day5a: (i + 5) % 50,
+            day5b: (i + 15) % 50,
+            day4: (i + 4) % 50,
+            day3: (i + 3) % 50,
+            day2: (i + 2) % 50,
+            day1: (i + 1) % 50,
+            day0: i % 50,
+            clientId: client.clientId,
+            portfolioName: client.portfolioName,
+          };
+        });
+
+        if (clientId) {
+          data = data.filter((row) => row.clientId === String(clientId));
+        }
+
+        if (portfolioName) {
+          const lower = String(portfolioName).toLowerCase();
+          data = data.filter((row) => row.portfolioName.toLowerCase().includes(lower));
+        }
+
+        const total = data.length;
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page,
+          pageSize,
+        };
+      });
+
+      this.get('/reports/rule-count', (_schema, request) => {
+        const { page = '0', pageSize = '10', runWindow = '', date = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const actions = ['Added', 'Updated', 'Deleted'];
+
+        const totalRecords = 45;
+        let data = Array.from({ length: totalRecords }, (_v, i) => ({
+          id: String(i + 1),
+          ruleCategoryName: categories[i % categories.length],
+          ruleSetName: ruleSets[i % ruleSets.length],
+          action: actions[i % actions.length],
+          ruleCount: 10 + (i % 20),
+          runWindow: ['Noon', 'Evening', 'Emergency'][i % 3],
+          date: date || new Date().toISOString().slice(0, 10),
+        }));
+
+        if (runWindow) {
+          data = data.filter((row) => row.runWindow === runWindow);
+        }
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
       // Rule changes report
       this.get('/reports/rule-changes', (_schema, request) => {
         const { page = '0', pageSize = '10', search = '' } = request.queryParams;
@@ -248,6 +475,243 @@ export function makeServer() {
 
         return {
           data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.get('/reports/rule-history', (_schema, request) => {
+        const {
+          page = '0',
+          pageSize = '10',
+          ruleName = '',
+          runWindow = '',
+          startDate = '',
+          endDate = '',
+        } = request.queryParams;
+
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const ruleNames = [
+          'Daily Spend Limit',
+          'MCC Block',
+          'Geo Velocity',
+          'High Risk Country',
+          'PIN Retry Limit',
+          'Offline Amount Cap',
+          'Merchant Category Allow',
+          'Card Present Required',
+          'International Usage',
+          'Transaction Amount Range',
+        ];
+        const modes = ['Enabled', 'Disabled', 'Monitor'];
+        const indicators = ['A', 'B', 'C', 'D'];
+        const windows = ['Noon', 'Evening'];
+
+        const totalRecords = 90;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setDate(created.getDate() - i);
+          created.setHours(9 + (i % 10), (i * 7) % 60);
+
+          return {
+            id: String(i + 1),
+            ruleCategory: categories[i % categories.length],
+            ruleSet: ruleSets[i % ruleSets.length],
+            ruleName: ruleNames[i % ruleNames.length],
+            mode: modes[i % modes.length],
+            ruleIndicator: indicators[i % indicators.length],
+            createdAt: created.toISOString(),
+            runWindow: windows[i % windows.length],
+          };
+        });
+
+        if (ruleName) {
+          const ruleLower = String(ruleName).toLowerCase();
+          data = data.filter((row) => row.ruleName.toLowerCase().includes(ruleLower));
+        }
+
+        if (runWindow) {
+          data = data.filter((row) => row.runWindow === runWindow);
+        }
+
+        if (startDate) {
+          const start = new Date(String(startDate));
+          data = data.filter((row) => new Date(row.createdAt) >= start);
+        }
+
+        if (endDate) {
+          const end = new Date(String(endDate));
+          data = data.filter((row) => new Date(row.createdAt) <= end);
+        }
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.get('/reports/rule-scheduler', (_schema, request) => {
+        const {
+          page = '0',
+          pageSize = '10',
+          ruleName = '',
+          runWindow = '',
+          startDate = '',
+          endDate = '',
+        } = request.queryParams;
+
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const ruleNames = [
+          'Daily Spend Limit',
+          'MCC Block',
+          'Geo Velocity',
+          'High Risk Country',
+          'PIN Retry Limit',
+          'Offline Amount Cap',
+          'Merchant Category Allow',
+          'Card Present Required',
+          'International Usage',
+          'Transaction Amount Range',
+        ];
+        const modes = ['Enabled', 'Disabled', 'Monitor'];
+        const windows = ['Noon', 'Evening', 'Emergency'];
+        const users = ['John Smith', 'Jane Johnson', 'Michael Brown', 'Sarah Davis', 'David Wilson'];
+        const systems = ['CoreSystem', 'RuleEngine', 'FraudShield'];
+        const financiers = ['FinCorp', 'BankOne', 'TrustX'];
+        const actionTypes = ['Create', 'Update', 'Delete'];
+
+        const totalRecords = 120;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setDate(created.getDate() - i);
+          created.setHours(9 + (i % 10), (i * 7) % 60);
+
+          return {
+            id: String(i + 1),
+            ruleCategory: categories[i % categories.length],
+            ruleSet: ruleSets[i % ruleSets.length],
+            ruleName: ruleNames[i % ruleNames.length],
+            mode: modes[i % modes.length],
+            ruleModeCode: 'T',
+            activeIndicator: i % 2 === 0 ? 'Y' : 'N',
+            scheduleDate: created.toISOString().slice(0, 10),
+            scheduleTime: created.toISOString().slice(11, 16),
+            approverFullName: users[i % users.length],
+            approverSetValue: `SET-${(i % 5) + 1}`,
+            ownerFullName: users[(i + 1) % users.length],
+            typeDescription: `Type ${((i % 3) + 1).toString()}`,
+            ruleModeDescription: `Mode ${modes[i % modes.length]}`,
+            schedulerFullName: users[(i + 2) % users.length],
+            systemName: systems[i % systems.length],
+            financierEmailId: `fin${(i % 5) + 1}@example.com`,
+            financerName: financiers[i % financiers.length],
+            formStatValue: `FS-${(i % 4) + 1}`,
+            actionTypeValue: actionTypes[i % actionTypes.length],
+            runWindow: windows[i % windows.length],
+            createdAt: created.toISOString(),
+          };
+        });
+
+        if (ruleName) {
+          const ruleLower = String(ruleName).toLowerCase();
+          data = data.filter((row) => row.ruleName.toLowerCase().includes(ruleLower));
+        }
+
+        if (runWindow) {
+          data = data.filter((row) => row.runWindow === runWindow);
+        }
+
+        if (startDate) {
+          const start = new Date(String(startDate));
+          data = data.filter((row) => new Date(row.createdAt) >= start);
+        }
+
+        if (endDate) {
+          const end = new Date(String(endDate));
+          data = data.filter((row) => new Date(row.createdAt) <= end);
+        }
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      this.get('/reports/operation-history', (_schema, request) => {
+        const { page = '0', pageSize = '10', operationType = '' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const users = [
+          { id: 'u1', name: 'John Smith' },
+          { id: 'u2', name: 'Jane Johnson' },
+          { id: 'u3', name: 'Michael Brown' },
+          { id: 'u4', name: 'Sarah Davis' },
+        ];
+
+        const ops = [
+          { label: 'Staging Refreshed', value: 'Synch_Stage' },
+          { label: 'Pruduction Refreshed', value: 'Sync_Prod' },
+          { label: 'Rule Schedule', value: 'Rule_Schedule' },
+        ];
+
+        const totalRecords = 60;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setMinutes(created.getMinutes() - i * 15);
+          const user = users[i % users.length];
+          const op = ops[i % ops.length];
+
+          return {
+            id: String(i + 1),
+            userId: user.id,
+            fullName: user.name,
+            operationType: op.label,
+            operationTypeValue: op.value,
+            createdAt: created.toISOString(),
+          };
+        });
+
+        if (operationType) {
+          data = data.filter((row) => row.operationTypeValue === operationType);
+        }
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated.map((row) => ({
+            id: row.id,
+            userId: row.userId,
+            fullName: row.fullName,
+            operationType: row.operationType,
+            createdAt: row.createdAt,
+          })),
           total,
           page: pageNum,
           pageSize: pageSizeNum,

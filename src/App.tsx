@@ -13,6 +13,20 @@ import { UserReportPage } from './pages/UserReportPage';
 import { ViewRuleChangesPage } from './pages/ViewRuleChangesPage';
 import { RefreshStagingPage } from './pages/RefreshStagingPage';
 import { WelcomePage } from './pages/WelcomePage';
+import { RuleHistoryPage } from './pages/RuleHistoryPage';
+import { RuleSchedulerPage } from './pages/RuleSchedulerPage';
+import { RefreshHistoryPage } from './pages/RefreshHistoryPage';
+import { UniqueUserLoginCountPage } from './pages/UniqueUserLoginCountPage';
+import { RuleCountPage } from './pages/RuleCountPage';
+import { UploadRuleSchedulerPage } from './pages/UploadRuleSchedulerPage';
+import { GetCgCountPansPage } from './pages/GetCgCountPansPage';
+import { SearchCgUsingPanPage } from './pages/SearchCgUsingPanPage';
+import { FiHotlistCheckPage } from './pages/FiHotlistCheckPage';
+import { HotlistAuditHistoryPage } from './pages/HotlistAuditHistoryPage';
+import { QueuesAssignedToUserGroupPage } from './pages/QueuesAssignedToUserGroupPage';
+import { UsersAssignedToUserGroupPage } from './pages/UsersAssignedToUserGroupPage';
+import { RolesAssignedToUserGroupPage } from './pages/RolesAssignedToUserGroupPage';
+import { RolesAssignedToSubTenantUsersPage } from './pages/RolesAssignedToSubTenantUsersPage';
 
 function App() {
   return (
@@ -70,7 +84,7 @@ function App() {
               path="rule-count"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Rule Count" />
+                  <RuleCountPage />
                 </RoleGuard>
               }
             />
@@ -86,7 +100,7 @@ function App() {
               path="upload-rule-scheduler"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Upload Rule Scheduler" />
+                  <UploadRuleSchedulerPage />
                 </RoleGuard>
               }
             />
@@ -94,7 +108,7 @@ function App() {
               path="rule-history"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Rule History" />
+                  <RuleHistoryPage />
                 </RoleGuard>
               }
             />
@@ -102,7 +116,16 @@ function App() {
               path="rule-scheduler-history"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Rule Scheduler History" />
+                  <RuleSchedulerPage />
+                </RoleGuard>
+              }
+            />
+
+            <Route
+              path="operation-history"
+              element={
+                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                  <RefreshHistoryPage />
                 </RoleGuard>
               }
             />
@@ -111,7 +134,7 @@ function App() {
               path="card-group/get-cg-count-pans"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Get CG Count and PANs" />
+                  <GetCgCountPansPage />
                 </RoleGuard>
               }
             />
@@ -119,7 +142,7 @@ function App() {
               path="card-group/search-cg-using-pan"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Search CG Using PAN" />
+                  <SearchCgUsingPanPage />
                 </RoleGuard>
               }
             />
@@ -128,7 +151,7 @@ function App() {
               path="hotlist/fi-hotlist-check"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="FI Hotlist Check" />
+                  <FiHotlistCheckPage />
                 </RoleGuard>
               }
             />
@@ -136,7 +159,7 @@ function App() {
               path="hotlist/hotlist-audit-history"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Hotlist Audit History" />
+                  <HotlistAuditHistoryPage />
                 </RoleGuard>
               }
             />
@@ -153,7 +176,7 @@ function App() {
               path="unique-user-login-count-report"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Unique User Login Count Report" />
+                  <UniqueUserLoginCountPage />
                 </RoleGuard>
               }
             />
@@ -203,7 +226,7 @@ function App() {
               path="user-group/queues-assigned"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Queues Assigned to User Group" />
+                  <QueuesAssignedToUserGroupPage />
                 </RoleGuard>
               }
             />
@@ -211,7 +234,7 @@ function App() {
               path="user-group/users-assigned"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Users Assigned to User Group" />
+                  <UsersAssignedToUserGroupPage />
                 </RoleGuard>
               }
             />
@@ -219,7 +242,7 @@ function App() {
               path="user-group/roles-assigned"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Roles Assigned to User Group" />
+                  <RolesAssignedToUserGroupPage />
                 </RoleGuard>
               }
             />
@@ -227,7 +250,7 @@ function App() {
               path="user-group/roles-assigned-sub-tenant-users"
               element={
                 <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Roles Assigned to Sub-Tenant Users" />
+                  <RolesAssignedToSubTenantUsersPage />
                 </RoleGuard>
               }
             />

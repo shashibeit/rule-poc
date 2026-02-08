@@ -34,11 +34,14 @@ export const AppLayout: FC = () => {
         sx={{
           flexGrow: 1,
           p: 3,
+          mt: '50px',
           minHeight: '100vh',
+          maxWidth: '85vw',
+          minWidth: 'auto',
           backgroundColor: (theme) => theme.palette.grey[100],
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ minHeight: 120 }} />
         <Outlet />
       </Box>
     </Box>

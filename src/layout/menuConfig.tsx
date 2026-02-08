@@ -80,6 +80,12 @@ export const menuConfig: MenuItem[] = [
     roles: ['admin', 'reviewer'],
   },
   {
+    label: 'Refresh History',
+    path: '/app/operation-history',
+    icon: <HistoryToggleOffIcon />,
+    roles: ['admin', 'reviewer'],
+  },
+  {
     label: 'Card Group (CG) Information',
     icon: <GroupWorkIcon />,
     roles: ['admin', 'reviewer'],

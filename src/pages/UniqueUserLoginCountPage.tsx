@@ -1,12 +1,12 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Typography, TextField, Grid } from '@mui/material';
+import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchUserReportAll, fetchUserReportSearch, setReportPagination } from '@/features/reports/userReportSlice';
-import { UserReportRecord } from '@/types';
+import { fetchUniqueUserLoginAll, fetchUniqueUserLoginSearch, setUniqueUserLoginPagination } from '@/features/reports/uniqueUserLoginSlice';
+import { UniqueUserLoginRecord } from '@/types';
 
-interface UserReportHeaderProps {
+interface UniqueUserLoginHeaderProps {
   clientId: string;
   portfolioName: string;
   errors: {
@@ -20,7 +20,7 @@ interface UserReportHeaderProps {
   onClear: () => void;
 }
 
-const UserReportHeader: FC<UserReportHeaderProps> = ({
+const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
   clientId,
   portfolioName,
   errors,
@@ -33,7 +33,7 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        User Report
+        Unique User Login Count Report
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
@@ -77,11 +77,12 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
   );
 };
 
-const UserReportGrid = withDataGrid(UserReportHeader);
+const UniqueUserLoginGrid = withDataGrid<UniqueUserLoginHeaderProps>(UniqueUserLoginHeader);
 
-export const UserReportPage: FC = () => {
+export const UniqueUserLoginCountPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, total, loading, pagination } = useAppSelector((state) => state.userReport);
+  const { records, total, loading, pagination } = useAppSelector((state) => state.uniqueUserLogin);
+
   const [clientId, setClientId] = useState('');
   const [portfolioName, setPortfolioName] = useState('');
   const [hasApplied, setHasApplied] = useState(false);
@@ -96,14 +97,14 @@ export const UserReportPage: FC = () => {
 
     if (mode === 'all') {
       dispatch(
-        fetchUserReportAll({
+        fetchUniqueUserLoginAll({
           page: pagination.page,
           pageSize: pagination.pageSize,
         })
       );
     } else {
       dispatch(
-        fetchUserReportSearch({
+        fetchUniqueUserLoginSearch({
           page: pagination.page,
           pageSize: pagination.pageSize,
           clientId: applied.clientId || undefined,
@@ -113,17 +114,17 @@ export const UserReportPage: FC = () => {
     }
   }, [dispatch, pagination.page, pagination.pageSize, applied, hasApplied, mode]);
 
-  const columns = useMemo<GridColDef<UserReportRecord>[]>(
+  const columns = useMemo<GridColDef<UniqueUserLoginRecord>[]>(
     () => [
-      { field: 'userId', headerName: 'User Id', width: 140 },
-      { field: 'fullName', headerName: 'Full Name', flex: 1, minWidth: 200 },
-      { field: 'operationType', headerName: 'Operation Type', width: 200 },
-      {
-        field: 'createdAt',
-        headerName: 'Created Timestamp',
-        width: 200,
-        valueGetter: (value: string) => new Date(value).toLocaleString(),
-      },
+      { field: 'time', headerName: 'Time', width: 120 },
+      { field: 'day6', headerName: 'Day 6', width: 110 },
+      { field: 'day5a', headerName: 'Day 5', width: 110 },
+      { field: 'day5b', headerName: 'Day 5', width: 110 },
+      { field: 'day4', headerName: 'Day 4', width: 110 },
+      { field: 'day3', headerName: 'Day 3', width: 110 },
+      { field: 'day2', headerName: 'Day 2', width: 110 },
+      { field: 'day1', headerName: 'Day 1', width: 110 },
+      { field: 'day0', headerName: 'Day 0', width: 110 },
     ],
     []
   );
@@ -135,13 +136,13 @@ export const UserReportPage: FC = () => {
     loading: hasApplied ? loading : false,
     page: pagination.page,
     pageSize: pagination.pageSize,
-    onPageChange: (newPage) => dispatch(setReportPagination({ page: newPage })),
+    onPageChange: (newPage) => dispatch(setUniqueUserLoginPagination({ page: newPage })),
     onPageSizeChange: (newPageSize) =>
-      dispatch(setReportPagination({ page: 0, pageSize: newPageSize })),
+      dispatch(setUniqueUserLoginPagination({ page: 0, pageSize: newPageSize })),
   };
 
   return (
-    <UserReportGrid
+    <UniqueUserLoginGrid
       {...props}
       clientId={clientId}
       portfolioName={portfolioName}
@@ -170,14 +171,14 @@ export const UserReportPage: FC = () => {
         setApplied({ clientId: clientId.trim(), portfolioName: portfolioName.trim() });
         setMode('search');
         setHasApplied(true);
-        dispatch(setReportPagination({ page: 0 }));
+        dispatch(setUniqueUserLoginPagination({ page: 0 }));
       }}
       onSearchAll={() => {
         setErrors({});
         setApplied({ clientId: '', portfolioName: '' });
         setMode('all');
         setHasApplied(true);
-        dispatch(setReportPagination({ page: 0 }));
+        dispatch(setUniqueUserLoginPagination({ page: 0 }));
       }}
       onClear={() => {
         setClientId('');
@@ -186,7 +187,7 @@ export const UserReportPage: FC = () => {
         setApplied({ clientId: '', portfolioName: '' });
         setMode('search');
         setHasApplied(false);
-        dispatch(setReportPagination({ page: 0 }));
+        dispatch(setUniqueUserLoginPagination({ page: 0 }));
       }}
     />
   );
