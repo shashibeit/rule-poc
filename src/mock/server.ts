@@ -47,8 +47,8 @@ export function makeServer() {
           return `${firstNames[i % firstNames.length]}.${lastNames[Math.floor(i / 2) % lastNames.length]}@company.com`;
         },
         role(i: number) {
-          // First 5 users are admins, rest are reviewers
-          return i < 5 ? 'admin' : 'reviewer';
+          // First 5 users are deployers, rest are reviewers
+          return i < 5 ? 'Rule_Deployer' : 'Rule_Reviewer';
         },
       }),
 

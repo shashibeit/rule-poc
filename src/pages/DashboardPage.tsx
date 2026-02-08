@@ -14,7 +14,7 @@ export const DashboardPage: FC = () => {
       value: '30',
       icon: <PeopleIcon sx={{ fontSize: 48 }} />,
       color: '#1976d2',
-      show: user?.role === 'admin',
+      show: user?.role === 'Rule_Deployer',
     },
     {
       title: 'Total Items',
@@ -86,9 +86,9 @@ export const DashboardPage: FC = () => {
           Role: <strong>{user?.role}</strong>
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {user?.role === 'admin'
-            ? 'As an admin, you have access to user management and all system features.'
-            : 'As a user, you can view items and manage your profile.'}
+          {user?.role === 'Rule_Deployer'
+            ? 'As a rule deployer, you have access to deployment and refresh features.'
+            : 'As a rule reviewer, you can access review and reporting features.'}
         </Typography>
       </Paper>
     </Container>

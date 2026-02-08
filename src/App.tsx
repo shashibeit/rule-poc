@@ -27,6 +27,8 @@ import { QueuesAssignedToUserGroupPage } from './pages/QueuesAssignedToUserGroup
 import { UsersAssignedToUserGroupPage } from './pages/UsersAssignedToUserGroupPage';
 import { RolesAssignedToUserGroupPage } from './pages/RolesAssignedToUserGroupPage';
 import { RolesAssignedToSubTenantUsersPage } from './pages/RolesAssignedToSubTenantUsersPage';
+import { AddFiPage } from './pages/AddFiPage';
+import { SearchModifyFiPage } from './pages/SearchModifyFiPage';
 
 function App() {
   return (
@@ -51,7 +53,7 @@ function App() {
             <Route
               path="refresh-staging"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Deployer', 'Rule_Reviewer']}>
                   <RefreshStagingPage />
                 </RoleGuard>
               }
@@ -59,7 +61,7 @@ function App() {
             <Route
               path="view-rule-changes"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Deployer', 'Rule_Reviewer']}>
                   <ViewRuleChangesPage />
                 </RoleGuard>
               }
@@ -67,7 +69,7 @@ function App() {
             <Route
               path="view-staged-rule"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="View Staged Rule" />
                 </RoleGuard>
               }
@@ -75,7 +77,7 @@ function App() {
             <Route
               path="download-stage-rules"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="Download Stage Rules" />
                 </RoleGuard>
               }
@@ -83,7 +85,7 @@ function App() {
             <Route
               path="rule-count"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <RuleCountPage />
                 </RoleGuard>
               }
@@ -91,7 +93,7 @@ function App() {
             <Route
               path="view-prod-rules"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="View Prod Rules" />
                 </RoleGuard>
               }
@@ -99,7 +101,7 @@ function App() {
             <Route
               path="upload-rule-scheduler"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <UploadRuleSchedulerPage />
                 </RoleGuard>
               }
@@ -107,7 +109,7 @@ function App() {
             <Route
               path="rule-history"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <RuleHistoryPage />
                 </RoleGuard>
               }
@@ -115,8 +117,16 @@ function App() {
             <Route
               path="rule-scheduler-history"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Deployer', 'Rule_Reviewer']}>
                   <RuleSchedulerPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="prod-syncup"
+              element={
+                <RoleGuard allowedRoles={['Rule_Deployer', 'Rule_Reviewer']}>
+                  <PageSkeleton title="Prod Syncup" />
                 </RoleGuard>
               }
             />
@@ -124,7 +134,7 @@ function App() {
             <Route
               path="operation-history"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Deployer', 'Rule_Reviewer']}>
                   <RefreshHistoryPage />
                 </RoleGuard>
               }
@@ -133,7 +143,7 @@ function App() {
             <Route
               path="card-group/get-cg-count-pans"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <GetCgCountPansPage />
                 </RoleGuard>
               }
@@ -141,7 +151,7 @@ function App() {
             <Route
               path="card-group/search-cg-using-pan"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <SearchCgUsingPanPage />
                 </RoleGuard>
               }
@@ -150,7 +160,7 @@ function App() {
             <Route
               path="hotlist/fi-hotlist-check"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <FiHotlistCheckPage />
                 </RoleGuard>
               }
@@ -158,7 +168,7 @@ function App() {
             <Route
               path="hotlist/hotlist-audit-history"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <HotlistAuditHistoryPage />
                 </RoleGuard>
               }
@@ -167,7 +177,7 @@ function App() {
             <Route
               path="user-report"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <UserReportPage />
                 </RoleGuard>
               }
@@ -175,7 +185,7 @@ function App() {
             <Route
               path="unique-user-login-count-report"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <UniqueUserLoginCountPage />
                 </RoleGuard>
               }
@@ -184,23 +194,23 @@ function App() {
             <Route
               path="portfolio-management/add-fi"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Add FI" />
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
+                  <AddFiPage />
                 </RoleGuard>
               }
             />
             <Route
               path="portfolio-management/search-modify-fi"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
-                  <PageSkeleton title="Search/Modify FI" />
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
+                  <SearchModifyFiPage />
                 </RoleGuard>
               }
             />
             <Route
               path="portfolio-management/modify-dc-sub-brand"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="Modify DC Sub-Brand" />
                 </RoleGuard>
               }
@@ -208,7 +218,7 @@ function App() {
             <Route
               path="portfolio-management/fi-boarding"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="FI Boarding" />
                 </RoleGuard>
               }
@@ -216,7 +226,7 @@ function App() {
             <Route
               path="portfolio-management/fi-boarding-status"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <PageSkeleton title="FI Boarding Status" />
                 </RoleGuard>
               }
@@ -225,7 +235,7 @@ function App() {
             <Route
               path="user-group/queues-assigned"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <QueuesAssignedToUserGroupPage />
                 </RoleGuard>
               }
@@ -233,7 +243,7 @@ function App() {
             <Route
               path="user-group/users-assigned"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <UsersAssignedToUserGroupPage />
                 </RoleGuard>
               }
@@ -241,7 +251,7 @@ function App() {
             <Route
               path="user-group/roles-assigned"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <RolesAssignedToUserGroupPage />
                 </RoleGuard>
               }
@@ -249,7 +259,7 @@ function App() {
             <Route
               path="user-group/roles-assigned-sub-tenant-users"
               element={
-                <RoleGuard allowedRoles={['admin', 'reviewer']}>
+                <RoleGuard allowedRoles={['Rule_Reviewer']}>
                   <RolesAssignedToSubTenantUsersPage />
                 </RoleGuard>
               }

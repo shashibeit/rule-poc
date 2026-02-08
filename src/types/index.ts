@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'reviewer';
+export type UserRole = 'Rule_Deployer' | 'Rule_Reviewer';
 
 export interface User {
   id: string;

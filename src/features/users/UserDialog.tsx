@@ -38,7 +38,7 @@ export const UserDialog: FC<UserDialogProps> = ({
   const initialValues: UserFormValues = {
     name: user?.name || '',
     email: user?.email || '',
-    role: user?.role || 'reviewer',
+    role: user?.role || 'Rule_Reviewer',
   };
 
   const form = useFormValidation<UserFormValues>({
@@ -118,8 +118,8 @@ export const UserDialog: FC<UserDialogProps> = ({
           touched={form.touched.role}
           margin="normal"
         >
-          <MenuItem value="reviewer">Reviewer</MenuItem>
-          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="Rule_Reviewer">Rule Reviewer</MenuItem>
+          <MenuItem value="Rule_Deployer">Rule Deployer</MenuItem>
         </FieldText>
 
         <FormActions

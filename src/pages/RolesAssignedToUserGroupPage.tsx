@@ -52,7 +52,7 @@ const ALL_ROWS: RoleAssignedRecord[] = [
     groupStatus: 'Active',
     createdBy: 'John Smith',
     groupCreationDate: '2026-01-20',
-    roleName: 'Reviewer',
+    roleName: 'Rule_Reviewer',
     remark: 'Primary',
   },
   {
@@ -65,7 +65,7 @@ const ALL_ROWS: RoleAssignedRecord[] = [
     groupStatus: 'Active',
     createdBy: 'Jane Johnson',
     groupCreationDate: '2026-01-18',
-    roleName: 'Admin',
+    roleName: 'Rule_Deployer',
     remark: 'Secondary',
   },
 ];

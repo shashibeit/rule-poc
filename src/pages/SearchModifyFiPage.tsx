@@ -3,29 +3,29 @@ import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 
-interface RolesAssignedSubTenantHeaderProps {
+interface SearchModifyFiHeaderProps {
   clientId: string;
-  userName: string;
-  errors: { clientId?: string; userName?: string };
+  portfolioName: string;
+  errors: { clientId?: string; portfolioName?: string };
   onClientIdChange: (value: string) => void;
-  onUserNameChange: (value: string) => void;
+  onPortfolioNameChange: (value: string) => void;
   onSearch: () => void;
   onSearchAll: () => void;
 }
 
-const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
+const SearchModifyFiHeader: FC<SearchModifyFiHeaderProps> = ({
   clientId,
-  userName,
+  portfolioName,
   errors,
   onClientIdChange,
-  onUserNameChange,
+  onPortfolioNameChange,
   onSearch,
   onSearchAll,
 }) => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Roles Assigned to Sub-Tenant Users
+        Search/Modify FI
       </Typography>
 
       <Grid container spacing={2} alignItems="center">
@@ -49,11 +49,11 @@ const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
           <TextField
             fullWidth
             size="small"
-            label="User Name"
-            value={userName}
-            onChange={(e) => onUserNameChange(e.target.value)}
-            error={!!errors.userName}
-            helperText={errors.userName}
+            label="Portfolio Name"
+            value={portfolioName}
+            onChange={(e) => onPortfolioNameChange(e.target.value)}
+            error={!!errors.portfolioName}
+            helperText={errors.portfolioName}
           />
         </Grid>
         <Grid item xs={12} md={5}>
@@ -71,57 +71,36 @@ const RolesAssignedSubTenantHeader: FC<RolesAssignedSubTenantHeaderProps> = ({
   );
 };
 
-const RolesAssignedSubTenantGrid = withDataGrid<RolesAssignedSubTenantHeaderProps>(
-  RolesAssignedSubTenantHeader
-);
+const SearchModifyFiGrid = withDataGrid<SearchModifyFiHeaderProps>(SearchModifyFiHeader);
 
-interface SubTenantRoleRecord {
+interface FiRecord {
   id: string;
   clientId: string;
-  userName: string;
-  roleName: string;
-  status: string;
-  createdBy: string;
-  createdAt: string;
+  portfolioName: string;
+  acro: string;
+  fiName: string;
 }
 
-const MOCK_ROWS: SubTenantRoleRecord[] = [
-  {
-    id: '1',
-    clientId: '1001',
-    userName: 'jsmith',
-    roleName: 'Rule_Reviewer',
-    status: 'Active',
-    createdBy: 'Rule_Deployer',
-    createdAt: '2026-01-20',
-  },
-  {
-    id: '2',
-    clientId: '1002',
-    userName: 'jjohnson',
-    roleName: 'Rule_Deployer',
-    status: 'Active',
-    createdBy: 'Rule_Deployer',
-    createdAt: '2026-01-18',
-  },
+const MOCK_ROWS: FiRecord[] = [
+  { id: '1', clientId: '1001', portfolioName: 'Alpha', acro: 'ALP', fiName: 'Alpha FI' },
+  { id: '2', clientId: '1002', portfolioName: 'Beta', acro: 'BET', fiName: 'Beta FI' },
+  { id: '3', clientId: '1003', portfolioName: 'Gamma', acro: 'GAM', fiName: 'Gamma FI' },
 ];
 
-export const RolesAssignedToSubTenantUsersPage: FC = () => {
+export const SearchModifyFiPage: FC = () => {
   const [clientId, setClientId] = useState('');
-  const [userName, setUserName] = useState('');
-  const [errors, setErrors] = useState<{ clientId?: string; userName?: string }>({});
-  const [rows, setRows] = useState<SubTenantRoleRecord[]>([]);
+  const [portfolioName, setPortfolioName] = useState('');
+  const [errors, setErrors] = useState<{ clientId?: string; portfolioName?: string }>({});
+  const [rows, setRows] = useState<FiRecord[]>([]);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const columns = useMemo<GridColDef<SubTenantRoleRecord>[]>(
+  const columns = useMemo<GridColDef<FiRecord>[]>(
     () => [
       { field: 'clientId', headerName: 'Client ID', width: 120 },
-      { field: 'userName', headerName: 'User Name', width: 160 },
-      { field: 'roleName', headerName: 'Role Name', width: 160 },
-      { field: 'status', headerName: 'Status', width: 120 },
-      { field: 'createdBy', headerName: 'Created By', width: 160 },
-      { field: 'createdAt', headerName: 'Created At', width: 150 },
+      { field: 'portfolioName', headerName: 'Portfolio Name', width: 180 },
+      { field: 'acro', headerName: 'ACRO', width: 120 },
+      { field: 'fiName', headerName: 'FI Name', width: 200 },
     ],
     []
   );
@@ -141,21 +120,21 @@ export const RolesAssignedToSubTenantUsersPage: FC = () => {
   };
 
   return (
-    <RolesAssignedSubTenantGrid
+    <SearchModifyFiGrid
       {...props}
       clientId={clientId}
-      userName={userName}
+      portfolioName={portfolioName}
       errors={errors}
       onClientIdChange={setClientId}
-      onUserNameChange={setUserName}
+      onPortfolioNameChange={setPortfolioName}
       onSearch={() => {
-        const nextErrors: { clientId?: string; userName?: string } = {};
-        const hasClientId = clientId.trim().length > 0;
-        const hasUserName = userName.trim().length > 0;
+        const trimmedClient = clientId.trim();
+        const trimmedPortfolio = portfolioName.trim();
+        const nextErrors: { clientId?: string; portfolioName?: string } = {};
 
-        if (!hasClientId && !hasUserName) {
-          nextErrors.clientId = 'Client ID or User Name is required';
-          nextErrors.userName = 'Client ID or User Name is required';
+        if (!trimmedClient && !trimmedPortfolio) {
+          nextErrors.clientId = 'Client ID or Portfolio Name is required';
+          nextErrors.portfolioName = 'Client ID or Portfolio Name is required';
         }
 
         setErrors(nextErrors);
@@ -164,7 +143,13 @@ export const RolesAssignedToSubTenantUsersPage: FC = () => {
           return;
         }
 
-        setRows(MOCK_ROWS);
+        const filtered = MOCK_ROWS.filter((row) => {
+          if (trimmedClient && row.clientId !== trimmedClient) return false;
+          if (trimmedPortfolio && !row.portfolioName.toLowerCase().includes(trimmedPortfolio.toLowerCase())) return false;
+          return true;
+        });
+
+        setRows(filtered);
         setPage(0);
       }}
       onSearchAll={() => {

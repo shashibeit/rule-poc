@@ -8,11 +8,11 @@ export const LoginPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = (role: 'admin' | 'reviewer') => {
+  const handleLogin = (role: 'Rule_Deployer' | 'Rule_Reviewer') => {
     const user = {
-      id: role === 'admin' ? '1' : '2',
-      name: role === 'admin' ? 'Admin User' : 'Reviewer User',
-      email: role === 'admin' ? 'admin@roleaudit.com' : 'reviewer@roleaudit.com',
+      id: role === 'Rule_Deployer' ? '1' : '2',
+      name: role === 'Rule_Deployer' ? 'Rule Deployer' : 'Rule Reviewer',
+      email: role === 'Rule_Deployer' ? 'ruledeployer@roleaudit.com' : 'rulereviewer@roleaudit.com',
       role,
     };
 
@@ -43,17 +43,17 @@ export const LoginPage: FC = () => {
               variant="contained"
               size="large"
               fullWidth
-              onClick={() => handleLogin('admin')}
+              onClick={() => handleLogin('Rule_Deployer')}
             >
-              Login as Admin
+              Login as Rule Deployer
             </Button>
             <Button
               variant="outlined"
               size="large"
               fullWidth
-              onClick={() => handleLogin('reviewer')}
+              onClick={() => handleLogin('Rule_Reviewer')}
             >
-              Login as Reviewer
+              Login as Rule Reviewer
             </Button>
           </Box>
         </Paper>
