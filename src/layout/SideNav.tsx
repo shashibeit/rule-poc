@@ -127,6 +127,8 @@ export const SideNav: FC<SideNavProps> = ({ open, onClose, variant = 'permanent'
             mt: '50px',
             height: 'calc(100vh - 50px)',
             overflow: 'hidden',
+            bgcolor: 'background.paper',
+            color: 'text.primary',
           },
         }}
       >
@@ -148,6 +150,8 @@ export const SideNav: FC<SideNavProps> = ({ open, onClose, variant = 'permanent'
           mt: '50px',
           height: 'calc(100vh - 50px)',
           overflow: 'hidden',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
         },
       }}
     >

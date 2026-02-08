@@ -38,7 +38,7 @@ export const AppLayout: FC = () => {
           minHeight: '100vh',
           maxWidth: '85vw',
           minWidth: 'auto',
-          backgroundColor: (theme) => theme.palette.grey[100],
+          backgroundColor: (theme) => theme.palette.background.default,
         }}
       >
         <Toolbar sx={{ minHeight: 120 }} />

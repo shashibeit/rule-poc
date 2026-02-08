@@ -7,11 +7,15 @@ import {
   IconButton,
   Box,
   Button,
+  Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
+import { useColorMode } from '@/theme/colorModeContext';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -21,6 +25,7 @@ export const TopBar: FC<TopBarProps> = ({ onMenuClick }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
+  const { mode, toggleColorMode } = useColorMode();
 
   const stageRefreshLabel = 'Last Stage Rule Refresh Date and Time: 02/06/2026 03:12 PM CST';
   const prodRefreshLabel = 'Last Prod Rule Refresh Date and Time: 02/06/2026 04:05 PM CST';
@@ -36,7 +41,7 @@ export const TopBar: FC<TopBarProps> = ({ onMenuClick }) => {
       elevation={0}
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: (theme) => theme.palette.grey[100],
+        bgcolor: (theme) => theme.palette.background.paper,
         color: 'text.primary',
         borderBottom: 1,
         borderColor: 'divider',
@@ -93,6 +98,11 @@ export const TopBar: FC<TopBarProps> = ({ onMenuClick }) => {
               <Typography variant="body2" sx={{ color: 'info.main' }}>
                 Welcome: {user?.name ?? 'User'}
               </Typography>
+              <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                <IconButton color="inherit" onClick={toggleColorMode} aria-label="toggle color mode">
+                  {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+                </IconButton>
+              </Tooltip>
               <Button
                 color="info"
                 startIcon={<LogoutIcon />}

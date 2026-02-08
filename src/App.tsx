@@ -1,7 +1,10 @@
+import { useMemo, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { theme } from './theme/theme';
+import { PaletteMode } from '@mui/material';
+import { getTheme } from './theme/theme';
+import { ColorModeContext } from './theme/colorModeContext';
 import { AppLayout } from './layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { RoleGuard } from './routes/RoleGuard';
@@ -30,13 +33,43 @@ import { RolesAssignedToSubTenantUsersPage } from './pages/RolesAssignedToSubTen
 import { AddFiPage } from './pages/AddFiPage';
 import { SearchModifyFiPage } from './pages/SearchModifyFiPage';
 
+const getInitialMode = (): PaletteMode => {
+  const stored = window.localStorage.getItem('color-mode');
+  if (stored === 'light' || stored === 'dark') {
+    return stored;
+  }
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+  return 'light';
+};
+
 function App() {
+  const [mode, setMode] = useState<PaletteMode>(getInitialMode);
+
+  const colorMode = useMemo(
+    () => ({
+      mode,
+      toggleColorMode: () => {
+        setMode((prev) => {
+          const next = prev === 'light' ? 'dark' : 'light';
+          window.localStorage.setItem('color-mode', next);
+          return next;
+        });
+      },
+    }),
+    [mode]
+  );
+
+  const theme = useMemo(() => getTheme(mode), [mode]);
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
 
           <Route
             path="/app"
@@ -269,9 +302,10 @@ function App() {
 
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
