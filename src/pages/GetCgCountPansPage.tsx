@@ -69,7 +69,7 @@ const MOCK_ROWS: CgCountRecord[] = [
     ruleName: 'Velocity Rule',
   },
   {
-    id: '2',
+    // Simulate missing ID to test ID generation
     clientId: '1002',
     portfolioName: 'Beta',
     compromiseIncidentId: 'CI-002',
@@ -77,7 +77,7 @@ const MOCK_ROWS: CgCountRecord[] = [
     lastUpdatedOnEst: '2026-02-06 02:40 PM',
     lastUpdatedBy: 'Jane Johnson',
     ruleName: 'Risk Rule',
-  },
+  } as any,
   {
     id: '3',
     clientId: '1003',
@@ -88,6 +88,16 @@ const MOCK_ROWS: CgCountRecord[] = [
     lastUpdatedBy: 'Michael Brown',
     ruleName: 'Compliance Rule',
   },
+  {
+    // Another record without ID to test
+    clientId: '1004',
+    portfolioName: 'Delta',
+    compromiseIncidentId: 'CI-004',
+    cardCount: 8,
+    lastUpdatedOnEst: '2026-02-05 09:30 AM',
+    lastUpdatedBy: 'Sarah Wilson',
+    ruleName: 'Security Rule',
+  } as any,
 ];
 
 export const GetCgCountPansPage: FC = () => {
@@ -121,13 +131,9 @@ export const GetCgCountPansPage: FC = () => {
     return MOCK_ROWS.filter((row) => row.compromiseIncidentId === trimmed);
   }, [hasApplied, compromiseIncidentId]);
 
-  const totalRows = filteredRows.length;
-  const pagedRows = filteredRows.slice(page * pageSize, page * pageSize + pageSize);
-
   const props: DataGridViewProps = {
-    rows: pagedRows,
+    rows: filteredRows,
     columns,
-    rowCount: totalRows,
     loading: false,
     page,
     pageSize,
@@ -136,6 +142,8 @@ export const GetCgCountPansPage: FC = () => {
       setPage(0);
       setPageSize(newPageSize);
     },
+    // Enable client-side pagination since we have all data loaded
+    clientSidePagination: true,
   };
 
   return (

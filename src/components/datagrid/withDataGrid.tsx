@@ -8,11 +8,12 @@ import {
   GridPagination,
 } from '@mui/x-data-grid';
 import { Box, Paper, TextField, Typography } from '@mui/material';
+import { generateRowId, clientSideSearch, ClientPaginationResult } from '@/utils/datagrid';
 
 export interface DataGridViewProps {
   rows: GridRowsProp;
   columns: GridColDef[];
-  rowCount: number;
+  rowCount?: number; // Optional for client-side pagination
   loading?: boolean;
   page: number;
   pageSize: number;
@@ -22,6 +23,11 @@ export interface DataGridViewProps {
   height?: number | string;
   toolbar?: ReactNode;
   showPageJump?: boolean;
+  // New props for client-side pagination
+  clientSidePagination?: boolean;
+  searchText?: string;
+  onSearchChange?: (searchText: string) => void;
+  searchFields?: string[];
 }
 
 export const withDataGrid = <P extends object>(
@@ -43,15 +49,59 @@ export const withDataGrid = <P extends object>(
       height = 'auto',
       toolbar,
       showPageJump = false,
+      clientSidePagination = false,
+      searchText = '',
+      onSearchChange,
+      searchFields = [],
       ...rest
     } = props;
 
+    const [localSearchText, setLocalSearchText] = useState(searchText);
+
+    // Enhanced row ID generator that handles missing IDs
+    const enhancedGetRowId = useMemo(() => {
+      if (getRowId) {
+        return getRowId;
+      }
+      return (row: any) => generateRowId(row, rows.indexOf(row));
+    }, [getRowId, rows]);
+
+    // Client-side data processing
+    const processedData = useMemo((): ClientPaginationResult<any> => {
+      if (!clientSidePagination) {
+        return {
+          paginatedData: rows,
+          totalCount: rowCount || rows.length,
+          pageCount: Math.ceil((rowCount || rows.length) / pageSize),
+        };
+      }
+
+      // For client-side pagination, only apply search filtering
+      // Let DataGrid handle pagination natively
+      let filteredData = rows;
+      if (localSearchText && searchFields.length > 0) {
+        filteredData = clientSideSearch(rows, localSearchText, searchFields);
+      }
+
+      return {
+        paginatedData: filteredData, // Return ALL filtered data, not paginated
+        totalCount: filteredData.length,
+        pageCount: Math.ceil(filteredData.length / pageSize),
+      };
+    }, [clientSidePagination, rows, localSearchText, searchFields, pageSize, rowCount]);
+
+    // Update local search text when external searchText changes
+    useEffect(() => {
+      setLocalSearchText(searchText);
+    }, [searchText]);
+
     const totalPages = useMemo(() => {
-      if (!rowCount || rowCount <= 0) {
+      const count = processedData.totalCount;
+      if (!count || count <= 0) {
         return 1;
       }
-      return Math.max(1, Math.ceil(rowCount / pageSize));
-    }, [rowCount, pageSize]);
+      return Math.max(1, Math.ceil(count / pageSize));
+    }, [processedData.totalCount, pageSize]);
 
     const [pageInput, setPageInput] = useState(String(page + 1));
 
@@ -161,15 +211,15 @@ export const withDataGrid = <P extends object>(
             }}
           >
             <DataGrid
-              rows={rows}
+              rows={processedData.paginatedData}
               columns={columns}
-              rowCount={rowCount}
+              rowCount={processedData.totalCount}
               loading={loading}
               pageSizeOptions={[5, 10, 25, 50]}
-              paginationMode="server"
+              paginationMode={clientSidePagination ? 'client' : 'server'}
               paginationModel={{ page, pageSize }}
               onPaginationModelChange={handlePaginationModelChange}
-              getRowId={getRowId}
+              getRowId={enhancedGetRowId}
               disableRowSelectionOnClick
               slots={slots}
               sx={{
