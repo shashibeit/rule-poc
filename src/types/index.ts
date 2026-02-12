@@ -17,12 +17,13 @@ export interface Item {
 
 export interface UserReportRecord {
   id: string;
-  userId: string;
+  clientId: string;
+  portfolioName: string;
   fullName: string;
-  operationType: string;
-  createdAt: string;
-  clientId?: string;
-  portfolioName?: string;
+  userName: string;
+  groupName: string;
+  userStatus: string;
+  emailEnable: string;
 }
 
 export interface UniqueUserLoginRecord {

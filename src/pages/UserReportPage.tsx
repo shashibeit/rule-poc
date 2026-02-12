@@ -1,5 +1,5 @@
-import { FC, useCallback, useMemo, useState, useEffect } from 'react';
-import { Box, Button, Typography, TextField, Grid } from '@mui/material';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { Box, Button, Typography, TextField, Grid, Chip } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -10,9 +10,10 @@ import { UserReportRecord } from '@/types';
  * UserReportPage - Uses CLIENT-SIDE pagination with Redux slice data
  * 
  * Features:
- * - Loads all data from mock API via Redux
+ * - Loads all user report data from mock API via Redux
  * - Client-side pagination and search
- * - Multi-field search functionality
+ * - Multi-field search functionality (clientId, portfolioName, fullName, userName, groupName, userStatus, emailEnable)
+ * - Visual status indicators with chips
  * - No server pagination calls after initial load
  */
 
@@ -214,14 +215,45 @@ export const UserReportPage: FC = () => {
 
   const columns = useMemo<GridColDef<UserReportRecord>[]>(
     () => [
-      { field: 'userId', headerName: 'User Id', width: 140 },
-      { field: 'fullName', headerName: 'Full Name', flex: 1, minWidth: 200 },
-      { field: 'operationType', headerName: 'Operation Type', width: 200 },
-      {
-        field: 'createdAt',
-        headerName: 'Created Timestamp',
-        width: 200,
-        valueGetter: (value: string) => new Date(value).toLocaleString(),
+      { field: 'clientId', headerName: 'Client ID', width: 120 },
+      { field: 'portfolioName', headerName: 'Portfolio Name', width: 150 },
+      { field: 'fullName', headerName: 'Full Name', flex: 1, minWidth: 180 },
+      { field: 'userName', headerName: 'User Name', width: 150 },
+      { field: 'groupName', headerName: 'Group Name', width: 160 },
+      { 
+        field: 'userStatus', 
+        headerName: 'User Status', 
+        width: 120,
+        renderCell: (params) => {
+          const status = params.value;
+          const getColor = (status: string) => {
+            switch (status?.toLowerCase()) {
+              case 'active': return 'success';
+              case 'inactive': return 'error';
+              case 'pending': return 'warning';
+              default: return 'default';
+            }
+          };
+          return (
+            <Chip 
+              label={status || 'Unknown'} 
+              size="small" 
+              color={getColor(status) as any}
+            />
+          );
+        }
+      },
+      { 
+        field: 'emailEnable', 
+        headerName: 'Email Enabled', 
+        width: 130,
+        renderCell: (params) => (
+          <Chip 
+            label={params.value || 'Unknown'} 
+            size="small" 
+            color={params.value === 'Yes' ? 'success' : 'default'}
+          />
+        )
       },
     ],
     []
@@ -242,7 +274,7 @@ export const UserReportPage: FC = () => {
     clientSidePagination: true,
     searchText,
     onSearchChange: setSearchText,
-    searchFields: ['userId', 'fullName', 'operationType', 'clientId', 'portfolioName'],
+    searchFields: ['clientId', 'portfolioName', 'fullName', 'userName', 'groupName', 'userStatus', 'emailEnable'],
   };
 
   return (

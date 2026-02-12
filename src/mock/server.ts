@@ -202,47 +202,36 @@ export function makeServer() {
         const pageSizeNum = parseInt(String(pageSize));
 
         const users = [
-          { userId: '1001', fullName: 'John Smith', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1002', fullName: 'Jane Johnson', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
-          { userId: '1006', fullName: 'Lisa Anderson', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1007', fullName: 'Robert Taylor', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1008', fullName: 'Emily White', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1009', fullName: 'Thomas Lee', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1010', fullName: 'Jessica Garcia', clientId: '1005', portfolioName: 'Omega' },
-          { userId: '1011', fullName: 'Daniel Martinez', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1012', fullName: 'Ashley Rodriguez', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1013', fullName: 'Christopher Moore', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1014', fullName: 'Amanda Clark', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1015', fullName: 'Matthew Lewis', clientId: '1005', portfolioName: 'Omega' }
-        ];
-        const ops = [
-          'Staging Refreshed', 
-          'Production Refreshed', 
-          'Rule Schedule', 
-          'User Access Updated',
-          'Portfolio Sync',
-          'Data Export',
-          'Report Generated',
-          'Audit Completed'
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'John Smith', userName: 'john.smith', groupName: 'Admin Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Jane Johnson', userName: 'jane.johnson', groupName: 'Finance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Michael Brown', userName: 'michael.brown', groupName: 'Risk Group', userStatus: 'Inactive', emailEnable: 'No' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Sarah Davis', userName: 'sarah.davis', groupName: 'Audit Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'David Wilson', userName: 'david.wilson', groupName: 'Compliance Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'Lisa Anderson', userName: 'lisa.anderson', groupName: 'Admin Group', userStatus: 'Pending', emailEnable: 'Yes' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Robert Taylor', userName: 'robert.taylor', groupName: 'Finance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Emily White', userName: 'emily.white', groupName: 'Risk Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Thomas Lee', userName: 'thomas.lee', groupName: 'Audit Group', userStatus: 'Inactive', emailEnable: 'Yes' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'Jessica Garcia', userName: 'jessica.garcia', groupName: 'Compliance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'Daniel Martinez', userName: 'daniel.martinez', groupName: 'Operations Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Ashley Rodriguez', userName: 'ashley.rodriguez', groupName: 'Security Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Christopher Moore', userName: 'christopher.moore', groupName: 'IT Group', userStatus: 'Pending', emailEnable: 'Yes' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Amanda Clark', userName: 'amanda.clark', groupName: 'Legal Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'Matthew Lewis', userName: 'matthew.lewis', groupName: 'Marketing Group', userStatus: 'Active', emailEnable: 'Yes' }
         ];
 
         const totalRecords = 250;
         const data = Array.from({ length: totalRecords }, (_v, i) => {
-          const created = new Date();
-          created.setMinutes(created.getMinutes() - i * 10);
           const user = users[i % users.length];
 
           return {
             id: String(i + 1),
-            userId: user.userId,
-            fullName: user.fullName,
-            operationType: ops[i % ops.length],
-            createdAt: created.toISOString(),
             clientId: user.clientId,
             portfolioName: user.portfolioName,
+            fullName: user.fullName,
+            userName: user.userName,
+            groupName: user.groupName,
+            userStatus: user.userStatus,
+            emailEnable: user.emailEnable,
           };
         });
 
@@ -264,46 +253,35 @@ export function makeServer() {
         const { page = 0, pageSize = 10, clientId = '', portfolioName = '' } = body;
 
         const users = [
-          { userId: '1001', fullName: 'John Smith', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1002', fullName: 'Jane Johnson', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
-          { userId: '1006', fullName: 'Lisa Anderson', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1007', fullName: 'Robert Taylor', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1008', fullName: 'Emily White', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1009', fullName: 'Thomas Lee', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1010', fullName: 'Jessica Garcia', clientId: '1005', portfolioName: 'Omega' },
-          { userId: '1011', fullName: 'Daniel Martinez', clientId: '1001', portfolioName: 'Alpha' },
-          { userId: '1012', fullName: 'Ashley Rodriguez', clientId: '1002', portfolioName: 'Beta' },
-          { userId: '1013', fullName: 'Christopher Moore', clientId: '1003', portfolioName: 'Gamma' },
-          { userId: '1014', fullName: 'Amanda Clark', clientId: '1004', portfolioName: 'Delta' },
-          { userId: '1015', fullName: 'Matthew Lewis', clientId: '1005', portfolioName: 'Omega' }
-        ];
-        const ops = [
-          'Staging Refreshed', 
-          'Production Refreshed', 
-          'Rule Schedule', 
-          'User Access Updated',
-          'Portfolio Sync',
-          'Data Export',
-          'Report Generated',
-          'Audit Completed'
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'John Smith', userName: 'john.smith', groupName: 'Admin Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Jane Johnson', userName: 'jane.johnson', groupName: 'Finance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Michael Brown', userName: 'michael.brown', groupName: 'Risk Group', userStatus: 'Inactive', emailEnable: 'No' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Sarah Davis', userName: 'sarah.davis', groupName: 'Audit Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'David Wilson', userName: 'david.wilson', groupName: 'Compliance Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'Lisa Anderson', userName: 'lisa.anderson', groupName: 'Admin Group', userStatus: 'Pending', emailEnable: 'Yes' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Robert Taylor', userName: 'robert.taylor', groupName: 'Finance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Emily White', userName: 'emily.white', groupName: 'Risk Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Thomas Lee', userName: 'thomas.lee', groupName: 'Audit Group', userStatus: 'Inactive', emailEnable: 'Yes' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'Jessica Garcia', userName: 'jessica.garcia', groupName: 'Compliance Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1001', portfolioName: 'Alpha', fullName: 'Daniel Martinez', userName: 'daniel.martinez', groupName: 'Operations Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1002', portfolioName: 'Beta', fullName: 'Ashley Rodriguez', userName: 'ashley.rodriguez', groupName: 'Security Group', userStatus: 'Active', emailEnable: 'Yes' },
+          { clientId: '1003', portfolioName: 'Gamma', fullName: 'Christopher Moore', userName: 'christopher.moore', groupName: 'IT Group', userStatus: 'Pending', emailEnable: 'Yes' },
+          { clientId: '1004', portfolioName: 'Delta', fullName: 'Amanda Clark', userName: 'amanda.clark', groupName: 'Legal Group', userStatus: 'Active', emailEnable: 'No' },
+          { clientId: '1005', portfolioName: 'Omega', fullName: 'Matthew Lewis', userName: 'matthew.lewis', groupName: 'Marketing Group', userStatus: 'Active', emailEnable: 'Yes' }
         ];
 
         let data = Array.from({ length: 250 }, (_v, i) => {
-          const created = new Date();
-          created.setMinutes(created.getMinutes() - i * 10);
           const user = users[i % users.length];
 
           return {
             id: String(i + 1),
-            userId: user.userId,
-            fullName: user.fullName,
-            operationType: ops[i % ops.length],
-            createdAt: created.toISOString(),
             clientId: user.clientId,
             portfolioName: user.portfolioName,
+            fullName: user.fullName,
+            userName: user.userName,
+            groupName: user.groupName,
+            userStatus: user.userStatus,
+            emailEnable: user.emailEnable,
           };
         });
 
