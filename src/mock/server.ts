@@ -207,10 +207,29 @@ export function makeServer() {
           { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
           { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
           { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
+          { userId: '1006', fullName: 'Lisa Anderson', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1007', fullName: 'Robert Taylor', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1008', fullName: 'Emily White', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1009', fullName: 'Thomas Lee', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1010', fullName: 'Jessica Garcia', clientId: '1005', portfolioName: 'Omega' },
+          { userId: '1011', fullName: 'Daniel Martinez', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1012', fullName: 'Ashley Rodriguez', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1013', fullName: 'Christopher Moore', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1014', fullName: 'Amanda Clark', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1015', fullName: 'Matthew Lewis', clientId: '1005', portfolioName: 'Omega' }
         ];
-        const ops = ['Staging Refreshed', 'Pruduction Refreshed', 'Rule Schedule'];
+        const ops = [
+          'Staging Refreshed', 
+          'Production Refreshed', 
+          'Rule Schedule', 
+          'User Access Updated',
+          'Portfolio Sync',
+          'Data Export',
+          'Report Generated',
+          'Audit Completed'
+        ];
 
-        const totalRecords = 80;
+        const totalRecords = 250;
         const data = Array.from({ length: totalRecords }, (_v, i) => {
           const created = new Date();
           created.setMinutes(created.getMinutes() - i * 10);
@@ -250,10 +269,29 @@ export function makeServer() {
           { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
           { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
           { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
+          { userId: '1006', fullName: 'Lisa Anderson', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1007', fullName: 'Robert Taylor', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1008', fullName: 'Emily White', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1009', fullName: 'Thomas Lee', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1010', fullName: 'Jessica Garcia', clientId: '1005', portfolioName: 'Omega' },
+          { userId: '1011', fullName: 'Daniel Martinez', clientId: '1001', portfolioName: 'Alpha' },
+          { userId: '1012', fullName: 'Ashley Rodriguez', clientId: '1002', portfolioName: 'Beta' },
+          { userId: '1013', fullName: 'Christopher Moore', clientId: '1003', portfolioName: 'Gamma' },
+          { userId: '1014', fullName: 'Amanda Clark', clientId: '1004', portfolioName: 'Delta' },
+          { userId: '1015', fullName: 'Matthew Lewis', clientId: '1005', portfolioName: 'Omega' }
         ];
-        const ops = ['Staging Refreshed', 'Pruduction Refreshed', 'Rule Schedule'];
+        const ops = [
+          'Staging Refreshed', 
+          'Production Refreshed', 
+          'Rule Schedule', 
+          'User Access Updated',
+          'Portfolio Sync',
+          'Data Export',
+          'Report Generated',
+          'Audit Completed'
+        ];
 
-        let data = Array.from({ length: 80 }, (_v, i) => {
+        let data = Array.from({ length: 250 }, (_v, i) => {
           const created = new Date();
           created.setMinutes(created.getMinutes() - i * 10);
           const user = users[i % users.length];

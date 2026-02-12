@@ -1,17 +1,19 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { Box, Button, Typography, TextField, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchUserReportAll, fetchUserReportSearch } from '@/features/reports/userReportSlice';
 import { UserReportRecord } from '@/types';
 
 /**
- * UserReportPage - Now uses CLIENT-SIDE pagination
+ * UserReportPage - Uses CLIENT-SIDE pagination with Redux slice data
  * 
  * Features:
- * - All data loaded at once (mock data for demo)
+ * - Loads all data from mock API via Redux
  * - Client-side pagination and search
  * - Multi-field search functionality
- * - No Redux/server calls for pagination
+ * - No server pagination calls after initial load
  */
 
 interface UserReportHeaderProps {
@@ -91,78 +93,35 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
   );
 };
 
-// Mock data for client-side pagination - in real app, load this from API once
-const MOCK_USER_REPORT_DATA: UserReportRecord[] = (() => {
-  const users = [
-    { userId: '1001', fullName: 'John Smith', clientId: '1001', portfolioName: 'Alpha' },
-    { userId: '1002', fullName: 'Jane Johnson', clientId: '1002', portfolioName: 'Beta' },
-    { userId: '1003', fullName: 'Michael Brown', clientId: '1003', portfolioName: 'Gamma' },
-    { userId: '1004', fullName: 'Sarah Davis', clientId: '1004', portfolioName: 'Delta' },
-    { userId: '1005', fullName: 'David Wilson', clientId: '1005', portfolioName: 'Omega' },
-    { userId: '1006', fullName: 'Lisa Anderson', clientId: '1001', portfolioName: 'Alpha' },
-    { userId: '1007', fullName: 'Robert Taylor', clientId: '1002', portfolioName: 'Beta' },
-    { userId: '1008', fullName: 'Emily White', clientId: '1003', portfolioName: 'Gamma' },
-    { userId: '1009', fullName: 'Thomas Lee', clientId: '1004', portfolioName: 'Delta' },
-    { userId: '1010', fullName: 'Jessica Garcia', clientId: '1005', portfolioName: 'Omega' },
-    { userId: '1011', fullName: 'Daniel Martinez', clientId: '1001', portfolioName: 'Alpha' },
-    { userId: '1012', fullName: 'Ashley Rodriguez', clientId: '1002', portfolioName: 'Beta' },
-    { userId: '1013', fullName: 'Christopher Moore', clientId: '1003', portfolioName: 'Gamma' },
-    { userId: '1014', fullName: 'Amanda Clark', clientId: '1004', portfolioName: 'Delta' },
-    { userId: '1015', fullName: 'Matthew Lewis', clientId: '1005', portfolioName: 'Omega' }
-  ];
-  const ops = [
-    'Staging Refreshed', 
-    'Production Refreshed', 
-    'Rule Schedule', 
-    'User Access Updated',
-    'Portfolio Sync',
-    'Data Export',
-    'Report Generated',
-    'Audit Completed'
-  ];
-
-  // Generate 250 records to show proper pagination
-  return Array.from({ length: 250 }, (_v, i) => {
-    const created = new Date();
-    created.setMinutes(created.getMinutes() - i * 10);
-    const user = users[i % users.length];
-
-    return {
-      id: String(i + 1),
-      userId: user.userId,
-      fullName: user.fullName,
-      operationType: ops[i % ops.length],
-      createdAt: created.toISOString(),
-      clientId: user.clientId,
-      portfolioName: user.portfolioName,
-    };
-  });
-})();
-
 const UserReportGrid = withDataGrid<UserReportHeaderProps>(UserReportHeader);
 
 export const UserReportPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { records, loading } = useAppSelector((state) => state.userReport);
+  
   const [clientId, setClientId] = useState('');
   const [portfolioName, setPortfolioName] = useState('');
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
-  const [hasApplied, setHasApplied] = useState(true); // Start with data loaded
-  const [mode, setMode] = useState<'search' | 'all'>('all'); // Start with all records loaded
+  const [hasApplied, setHasApplied] = useState(false); // No data loaded initially
+  const [mode, setMode] = useState<'search' | 'all'>('search'); // Start with search mode
   const [errors, setErrors] = useState<{ clientId?: string; portfolioName?: string }>({});
   const [applied, setApplied] = useState({ clientId: '', portfolioName: '' });
 
+  // No useEffect - data is only loaded when user clicks buttons
+
   // Filter data based on applied search criteria
   const filteredData = useMemo(() => {
-    if (!hasApplied) {
+    if (!hasApplied || !records.length) {
       return [];
     }
 
     if (mode === 'all') {
-      return MOCK_USER_REPORT_DATA;
+      return records;
     }
 
-    let data = MOCK_USER_REPORT_DATA;
+    let data = records;
 
     if (applied.clientId) {
       data = data.filter((row) => row.clientId === applied.clientId);
@@ -174,12 +133,18 @@ export const UserReportPage: FC = () => {
     }
 
     return data;
-  }, [hasApplied, mode, applied]);
+  }, [hasApplied, mode, applied, records]);
 
   // Show data count for user feedback
   const dataInfo = useMemo(() => {
+    if (loading) {
+      return 'Loading data...';
+    }
     if (!hasApplied) {
-      return 'Click "Search All" to load all records or enter search criteria';
+      return 'Click "Search All" to load all records or enter search criteria and click "Search"';
+    }
+    if (!records.length) {
+      return 'No records found';
     }
     const count = filteredData.length;
     const totalPages = Math.ceil(count / pageSize);
@@ -190,7 +155,7 @@ export const UserReportPage: FC = () => {
       return `Showing ${currentStart}-${currentEnd} of ${count} total records (Page ${page + 1} of ${totalPages})`;
     }
     return `Found ${count} records matching your criteria - Showing ${currentStart}-${currentEnd} (Page ${page + 1} of ${totalPages})`;
-  }, [hasApplied, filteredData.length, mode, page, pageSize]);
+  }, [loading, hasApplied, records.length, filteredData.length, mode, page, pageSize]);
 
   const handleSearch = useCallback(() => {
     const nextErrors: { clientId?: string; portfolioName?: string } = {};
@@ -207,12 +172,22 @@ export const UserReportPage: FC = () => {
       return;
     }
 
-    setApplied({ clientId: clientId.trim(), portfolioName: portfolioName.trim() });
+    // Set applied filters and fetch data
+    const searchParams = { clientId: clientId.trim(), portfolioName: portfolioName.trim() };
+    setApplied(searchParams);
     setMode('search');
     setHasApplied(true);
     setPage(0);
     setSearchText('');
-  }, [clientId, portfolioName]);
+    
+    // Make API call with search filters
+    dispatch(fetchUserReportSearch({
+      page: 0,
+      pageSize: 1000,
+      clientId: searchParams.clientId || undefined,
+      portfolioName: searchParams.portfolioName || undefined,
+    }));
+  }, [clientId, portfolioName, dispatch]);
 
   const handleSearchAll = useCallback(() => {
     setErrors({});
@@ -221,7 +196,10 @@ export const UserReportPage: FC = () => {
     setHasApplied(true);
     setPage(0);
     setSearchText('');
-  }, []);
+    
+    // Make API call to fetch all data
+    dispatch(fetchUserReportAll({ page: 0, pageSize: 1000 }));
+  }, [dispatch]);
 
   const handleClear = useCallback(() => {
     setClientId('');
@@ -229,7 +207,7 @@ export const UserReportPage: FC = () => {
     setErrors({});
     setApplied({ clientId: '', portfolioName: '' });
     setMode('search');
-    setHasApplied(false);
+    setHasApplied(false); // Clear data
     setPage(0);
     setSearchText('');
   }, []);
@@ -252,7 +230,7 @@ export const UserReportPage: FC = () => {
   const props: DataGridViewProps = {
     rows: filteredData,
     columns,
-    loading: false,
+    loading,
     page,
     pageSize,
     onPageChange: setPage,
