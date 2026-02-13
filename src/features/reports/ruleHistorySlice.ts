@@ -32,11 +32,39 @@ export const fetchRuleHistory = createAsyncThunk(
     startDate?: string;
     endDate?: string;
   }) => {
-    const response = await apiClient.get<{
-      data: RuleHistoryRecord[];
-      total: number;
-    }>('/reports/rule-history', params);
-    return response;
+    // Format dates to "1-NOV-2025" format
+    const formatDate = (dateString: string | undefined) => {
+      if (!dateString) return undefined;
+      const date = new Date(dateString);
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+                      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const day = date.getDate();
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+    const payload = {
+      ruleFromDate: formatDate(params.startDate),
+      ruleDateTo: formatDate(params.endDate),
+      pageNum: params.page,
+      pageSize: params.pageSize,
+      counter: 0, // Default counter value
+      ruleName: params.ruleName || '',
+      ruleTime: params.runWindow || '',
+    };
+
+    const response = await apiClient.post<{
+      code: string;
+      message: string;
+      ruleHistoryList: RuleHistoryRecord[];
+      totalRecords: number;
+    }>('/rules/v1/ruleHistoryList', payload);
+    
+    return {
+      data: response.ruleHistoryList,
+      total: response.totalRecords,
+    };
   }
 );
 

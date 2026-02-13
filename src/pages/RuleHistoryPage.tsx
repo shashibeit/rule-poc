@@ -111,7 +111,7 @@ const RuleHistoryHeader: FC<RuleHistoryHeaderProps> = ({
             <TextField
               fullWidth
               size="small"
-              label="Search"
+              label="Rule Name"
               value={ruleName}
               onChange={(e) => onRuleNameChange(e.target.value)}
               error={!!errors.ruleName}

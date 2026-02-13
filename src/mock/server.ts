@@ -497,6 +497,106 @@ export function makeServer() {
         };
       });
 
+      // New rule history API endpoint
+      this.post('/rules/v1/ruleHistoryList', (_schema, request) => {
+        const body = JSON.parse(request.requestBody);
+        const {
+          ruleFromDate = '',
+          ruleDateTo = '',
+          pageNum = 0,
+          pageSize = 10,
+          counter = 0,
+          ruleName = '',
+          ruleTime = '',
+        } = body;
+
+        // Parse date format from "1-NOV-2025" to Date object
+        const parseDate = (dateString: string) => {
+          if (!dateString) return null;
+          const months = {
+            'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+            'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11,
+          };
+          const parts = dateString.split('-');
+          if (parts.length !== 3) return null;
+          const day = parseInt(parts[0]);
+          const month = months[parts[1] as keyof typeof months];
+          const year = parseInt(parts[2]);
+          return new Date(year, month, day);
+        };
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const ruleNames = [
+          'Daily Spend Limit',
+          'MCC Block',
+          'Geo Velocity',
+          'High Risk Country',
+          'PIN Retry Limit',
+          'Offline Amount Cap',
+          'Merchant Category Allow',
+          'Card Present Required',
+          'International Usage',
+          'Transaction Amount Range',
+        ];
+        const modes = ['Enabled', 'Disabled', 'Monitor'];
+        const indicators = ['A', 'B', 'C', 'D'];
+        const windows = ['Noon', 'Evening'];
+
+        const totalRecords = 90;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setDate(created.getDate() - i);
+          created.setHours(9 + (i % 10), (i * 7) % 60);
+
+          return {
+            id: String(i + 1),
+            ruleCategory: categories[i % categories.length],
+            ruleSet: ruleSets[i % ruleSets.length],
+            ruleName: ruleNames[i % ruleNames.length],
+            mode: modes[i % modes.length],
+            ruleIndicator: indicators[i % indicators.length],
+            createdAt: created.toISOString(),
+            runWindow: windows[i % windows.length],
+          };
+        });
+
+        if (ruleName) {
+          const ruleLower = String(ruleName).toLowerCase();
+          data = data.filter((row) => row.ruleName.toLowerCase().includes(ruleLower));
+        }
+
+        if (ruleTime) {
+          data = data.filter((row) => row.runWindow === ruleTime);
+        }
+
+        if (ruleFromDate) {
+          const start = parseDate(String(ruleFromDate));
+          if (start) {
+            data = data.filter((row) => new Date(row.createdAt) >= start);
+          }
+        }
+
+        if (ruleDateTo) {
+          const end = parseDate(String(ruleDateTo));
+          if (end) {
+            data = data.filter((row) => new Date(row.createdAt) <= end);
+          }
+        }
+
+        const totalRecordsFiltered = data.length;
+        const start = pageNum * pageSize;
+        const end = start + pageSize;
+        const paginated = data.slice(start, end);
+
+        return {
+          code: '200',
+          message: 'Success',
+          ruleHistoryList: paginated,
+          totalRecords: totalRecordsFiltered,
+        };
+      });
+
       this.get('/reports/rule-history', (_schema, request) => {
         const {
           page = '0',
