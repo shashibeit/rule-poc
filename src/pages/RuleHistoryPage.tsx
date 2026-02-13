@@ -184,12 +184,12 @@ export const RuleHistoryPage: FC = () => {
   const columns = useMemo<GridColDef<RuleHistoryRecord>[]>(
     () => [
       { field: 'ruleCategory', headerName: 'Rule Category', flex: 1, minWidth: 180 },
-      { field: 'ruleSet', headerName: 'Rule Set', flex: 1, minWidth: 160 },
+      { field: 'ruleSetName', headerName: 'Rule Set', flex: 1, minWidth: 160 },
       { field: 'ruleName', headerName: 'Rule Name', flex: 1, minWidth: 200 },
-      { field: 'mode', headerName: 'Mode', width: 130 },
-      { field: 'ruleIndicator', headerName: 'Rule Indicator', width: 150 },
+      { field: 'ruleMode', headerName: 'Mode', width: 130 },
+      { field: 'ruleActvIndc', headerName: 'Rule Indicator', width: 150 },
       {
-        field: 'createdAt',
+        field: 'crteTms',
         headerName: 'Created Time Stamp',
         width: 220,
         valueGetter: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),

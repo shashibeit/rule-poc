@@ -61,11 +61,11 @@ export interface RuleChangeRecord {
 export interface RuleHistoryRecord {
   id: string;
   ruleCategory: string;
-  ruleSet: string;
+  ruleSetName: string;
   ruleName: string;
-  mode: string;
-  ruleIndicator: string;
-  createdAt: string;
+  ruleMode: string;
+  ruleActvIndc: string;
+  crteTms: string;
 }
 
 export interface RuleSchedulerRecord {

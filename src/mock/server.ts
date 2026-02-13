@@ -552,11 +552,11 @@ export function makeServer() {
           return {
             id: String(i + 1),
             ruleCategory: categories[i % categories.length],
-            ruleSet: ruleSets[i % ruleSets.length],
+            ruleSetName: ruleSets[i % ruleSets.length],
             ruleName: ruleNames[i % ruleNames.length],
-            mode: modes[i % modes.length],
-            ruleIndicator: indicators[i % indicators.length],
-            createdAt: created.toISOString(),
+            ruleMode: modes[i % modes.length],
+            ruleActvIndc: indicators[i % indicators.length],
+            crteTms: created.toISOString(),
             runWindow: windows[i % windows.length],
           };
         });
@@ -573,14 +573,14 @@ export function makeServer() {
         if (ruleFromDate) {
           const start = parseDate(String(ruleFromDate));
           if (start) {
-            data = data.filter((row) => new Date(row.createdAt) >= start);
+            data = data.filter((row) => new Date(row.crteTms) >= start);
           }
         }
 
         if (ruleDateTo) {
           const end = parseDate(String(ruleDateTo));
           if (end) {
-            data = data.filter((row) => new Date(row.createdAt) <= end);
+            data = data.filter((row) => new Date(row.crteTms) <= end);
           }
         }
 
@@ -637,11 +637,11 @@ export function makeServer() {
           return {
             id: String(i + 1),
             ruleCategory: categories[i % categories.length],
-            ruleSet: ruleSets[i % ruleSets.length],
+            ruleSetName: ruleSets[i % ruleSets.length],
             ruleName: ruleNames[i % ruleNames.length],
-            mode: modes[i % modes.length],
-            ruleIndicator: indicators[i % indicators.length],
-            createdAt: created.toISOString(),
+            ruleMode: modes[i % modes.length],
+            ruleActvIndc: indicators[i % indicators.length],
+            crteTms: created.toISOString(),
             runWindow: windows[i % windows.length],
           };
         });
@@ -657,12 +657,12 @@ export function makeServer() {
 
         if (startDate) {
           const start = new Date(String(startDate));
-          data = data.filter((row) => new Date(row.createdAt) >= start);
+          data = data.filter((row) => new Date(row.crteTms) >= start);
         }
 
         if (endDate) {
           const end = new Date(String(endDate));
-          data = data.filter((row) => new Date(row.createdAt) <= end);
+          data = data.filter((row) => new Date(row.crteTms) <= end);
         }
 
         const total = data.length;
