@@ -28,7 +28,21 @@ export const fetchOperationHistory = createAsyncThunk(
     const response = await apiClient.get<{
       data: OperationHistoryRecord[];
       total: number;
-    }>('/reports/operation-history', params);
+    }>(`/rules/v1/refreshHistory/${params.operationType}`, {
+      page: params.page,
+      pageSize: params.pageSize
+    });
+    return response;
+  }
+);
+
+export const fetchOperationHistoryAll = createAsyncThunk(
+  'reports/fetchOperationHistoryAll',
+  async (params: { operationType: string }) => {
+    const response = await apiClient.get<{
+      data: OperationHistoryRecord[];
+      total: number;
+    }>(`/rules/v1/refreshHistory/${params.operationType}/all`);
     return response;
   }
 );
@@ -53,6 +67,19 @@ const operationHistorySlice = createSlice({
         state.total = action.payload.total;
       })
       .addCase(fetchOperationHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to load operation history';
+      })
+      .addCase(fetchOperationHistoryAll.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOperationHistoryAll.fulfilled, (state, action) => {
+        state.loading = false;
+        state.records = action.payload.data;
+        state.total = action.payload.total;
+      })
+      .addCase(fetchOperationHistoryAll.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load operation history';
       });

@@ -776,6 +776,92 @@ export function makeServer() {
         };
       });
 
+      // New refresh history endpoints with appended operation type
+      this.get('/rules/v1/refreshHistory/:operationType', (_schema, request) => {
+        const { operationType } = request.params;
+        const { page = '0', pageSize = '10' } = request.queryParams;
+        const pageNum = parseInt(String(page));
+        const pageSizeNum = parseInt(String(pageSize));
+
+        const users = [
+          { id: 'u1', name: 'John Smith' },
+          { id: 'u2', name: 'Jane Johnson' },
+          { id: 'u3', name: 'Michael Brown' },
+          { id: 'u4', name: 'Sarah Davis' },
+        ];
+
+        const opTypeMap: Record<string, string> = {
+          'Synch_Stage': 'Staging Refreshed',
+          'Sync_Prod': 'Production Refreshed',
+          'Rule_Schedule': 'Rule Schedule',
+        };
+
+        const totalRecords = 60;
+        let data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setMinutes(created.getMinutes() - i * 15);
+          const user = users[i % users.length];
+
+          return {
+            id: String(i + 1),
+            userId: user.id,
+            fullName: user.name,
+            operationType: opTypeMap[String(operationType)] || String(operationType),
+            createTms: created.toISOString(),
+          };
+        });
+
+        const total = data.length;
+        const start = pageNum * pageSizeNum;
+        const end = start + pageSizeNum;
+        const paginated = data.slice(start, end);
+
+        return {
+          data: paginated,
+          total,
+          page: pageNum,
+          pageSize: pageSizeNum,
+        };
+      });
+
+      // Client-side pagination endpoint - returns all data
+      this.get('/rules/v1/refreshHistory/:operationType/all', (_schema, request) => {
+        const { operationType } = request.params;
+
+        const users = [
+          { id: 'u1', name: 'John Smith' },
+          { id: 'u2', name: 'Jane Johnson' },
+          { id: 'u3', name: 'Michael Brown' },
+          { id: 'u4', name: 'Sarah Davis' },
+        ];
+
+        const opTypeMap: Record<string, string> = {
+          'Synch_Stage': 'Staging Refreshed',
+          'Sync_Prod': 'Production Refreshed',
+          'Rule_Schedule': 'Rule Schedule',
+        };
+
+        const totalRecords = 60;
+        const data = Array.from({ length: totalRecords }, (_v, i) => {
+          const created = new Date();
+          created.setMinutes(created.getMinutes() - i * 15);
+          const user = users[i % users.length];
+
+          return {
+            id: String(i + 1),
+            userId: user.id,
+            fullName: user.name,
+            operationType: opTypeMap[String(operationType)] || String(operationType),
+            createTms: created.toISOString(),
+          };
+        });
+
+        return {
+          data,
+          total: data.length,
+        };
+      });
+
       this.get('/reports/operation-history', (_schema, request) => {
         const { page = '0', pageSize = '10', operationType = '' } = request.queryParams;
         const pageNum = parseInt(String(page));
@@ -807,7 +893,7 @@ export function makeServer() {
             fullName: user.name,
             operationType: op.label,
             operationTypeValue: op.value,
-            createdAt: created.toISOString(),
+            createTms: created.toISOString(),
           };
         });
 
@@ -826,7 +912,7 @@ export function makeServer() {
             userId: row.userId,
             fullName: row.fullName,
             operationType: row.operationType,
-            createdAt: row.createdAt,
+            createTms: row.createTms,
           })),
           total,
           page: pageNum,

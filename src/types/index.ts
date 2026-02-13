@@ -96,7 +96,7 @@ export interface OperationHistoryRecord {
   userId: string;
   fullName: string;
   operationType: string;
-  createdAt: string;
+  createTms: string;
 }
 
 export interface AuthState {

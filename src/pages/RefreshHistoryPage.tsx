@@ -2,9 +2,9 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { Box, Typography, TextField, MenuItem, Button, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
-import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { AppDataGrid } from '@/components/datagrid/AppDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchOperationHistory, setOperationHistoryPagination } from '@/features/reports/operationHistorySlice';
+import { fetchOperationHistoryAll } from '@/features/reports/operationHistorySlice';
 import { OperationHistoryRecord } from '@/types';
 
 interface OperationHistoryHeaderProps {
@@ -61,15 +61,15 @@ const OperationHistoryHeader: FC<OperationHistoryHeaderProps> = ({
   );
 };
 
-const OperationHistoryGrid = withDataGrid<OperationHistoryHeaderProps>(OperationHistoryHeader);
-
 export const RefreshHistoryPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, total, loading, pagination } = useAppSelector((state) => state.operationHistory);
+  const { records, loading } = useAppSelector((state) => state.operationHistory);
 
   const [operationType, setOperationType] = useState('');
   const [error, setError] = useState<string | undefined>(undefined);
   const [hasApplied, setHasApplied] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
 
   const [applied, setApplied] = useState({
     operationType: '',
@@ -81,13 +81,11 @@ export const RefreshHistoryPage: FC = () => {
     }
 
     dispatch(
-      fetchOperationHistory({
-        page: pagination.page,
-        pageSize: pagination.pageSize,
+      fetchOperationHistoryAll({
         operationType: applied.operationType,
       })
     );
-  }, [dispatch, pagination.page, pagination.pageSize, applied, hasApplied]);
+  }, [dispatch, applied, hasApplied]);
 
   const columns = useMemo<GridColDef<OperationHistoryRecord>[]>(
     () => [
@@ -95,7 +93,7 @@ export const RefreshHistoryPage: FC = () => {
       { field: 'fullName', headerName: 'Full Name', flex: 1, minWidth: 200 },
       { field: 'operationType', headerName: 'Operation Type', width: 200 },
       {
-        field: 'createdAt',
+        field: 'createTms',
         headerName: 'Created Timestamp',
         width: 220,
         valueGetter: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),
@@ -104,41 +102,41 @@ export const RefreshHistoryPage: FC = () => {
     []
   );
 
-  const props: DataGridViewProps = {
-    rows: hasApplied ? records : [],
-    columns,
-    rowCount: hasApplied ? total : 0,
-    loading: hasApplied ? loading : false,
-    page: pagination.page,
-    pageSize: pagination.pageSize,
-    onPageChange: (newPage) => dispatch(setOperationHistoryPagination({ page: newPage })),
-    onPageSizeChange: (newPageSize) =>
-      dispatch(setOperationHistoryPagination({ page: 0, pageSize: newPageSize })),
-  };
-
   return (
-    <OperationHistoryGrid
-      {...props}
-      operationType={operationType}
-      error={error}
-      onOperationTypeChange={setOperationType}
-      onSearch={() => {
-        if (!operationType) {
-          setError('Operation Type is required');
-          return;
-        }
-        setError(undefined);
-        setApplied({ operationType });
-        setHasApplied(true);
-        dispatch(setOperationHistoryPagination({ page: 0 }));
-      }}
-      onClear={() => {
-        setOperationType('');
-        setError(undefined);
-        setApplied({ operationType: '' });
-        setHasApplied(false);
-        dispatch(setOperationHistoryPagination({ page: 0 }));
-      }}
-    />
+    <Box>
+      <OperationHistoryHeader
+        operationType={operationType}
+        error={error}
+        onOperationTypeChange={setOperationType}
+        onSearch={() => {
+          if (!operationType) {
+            setError('Operation Type is required');
+            return;
+          }
+          setError(undefined);
+          setApplied({ operationType });
+          setHasApplied(true);
+        }}
+        onClear={() => {
+          setOperationType('');
+          setError(undefined);
+          setApplied({ operationType: '' });
+          setHasApplied(false);
+        }}
+      />
+      <Box sx={{ mt: 2 }}>
+        <AppDataGrid
+          rows={hasApplied ? records : []}
+          columns={columns}
+          loading={hasApplied ? loading : false}
+          clientSidePagination={true}
+          searchFields={['userId', 'fullName', 'operationType']}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      </Box>
+    </Box>
   );
 };
