@@ -64,7 +64,8 @@ const ruleCountSlice = createSlice({
       .addCase(fetchRuleCountAllData.fulfilled, (state, action) => {
         state.loading = false;
         // Transform the API response to match our interface
-        const transformedData = action.payload.ruleCountList.map((item, index) => ({
+        const ruleCountList = action.payload.ruleCountList || [];
+        const transformedData = ruleCountList.map((item, index) => ({
           id: `rule-count-${index + 1}`,
           ruleCategoryName: item.ruleCategory,
           ruleSetName: item.ruleSet,

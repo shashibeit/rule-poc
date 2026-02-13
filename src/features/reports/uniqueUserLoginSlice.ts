@@ -70,8 +70,8 @@ const uniqueUserLoginSlice = createSlice({
       })
       .addCase(fetchUniqueUserLoginAllData.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload.data;
-        state.total = action.payload.total;
+        state.records = action.payload.data || [];
+        state.total = action.payload.data?.length || 0;
       })
       .addCase(fetchUniqueUserLoginAllData.rejected, (state, action) => {
         state.loading = false;
@@ -83,8 +83,8 @@ const uniqueUserLoginSlice = createSlice({
       })
       .addCase(fetchUniqueUserLoginSearchData.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload.data;
-        state.total = action.payload.total;
+        state.records = action.payload.data || [];
+        state.total = action.payload.data?.length || 0;
       })
       .addCase(fetchUniqueUserLoginSearchData.rejected, (state, action) => {
         state.loading = false;

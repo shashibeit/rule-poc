@@ -58,12 +58,12 @@ export const fetchRuleHistory = createAsyncThunk(
       code: string;
       message: string;
       ruleHistoryList: RuleHistoryRecord[];
-      totalRecords: number;
+      totalRecords?: number; // Make optional since we'll calculate from data
     }>('/rules/v1/ruleHistoryList', payload);
     
     return {
-      data: response.ruleHistoryList,
-      total: response.totalRecords,
+      data: response.ruleHistoryList || [],
+      total: response.ruleHistoryList?.length || 0, // Calculate from data, not API total
     };
   }
 );
@@ -84,8 +84,8 @@ const ruleHistorySlice = createSlice({
       })
       .addCase(fetchRuleHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload.data;
-        state.total = action.payload.total;
+        state.records = action.payload.data || [];
+        state.total = action.payload.data?.length || 0;
       })
       .addCase(fetchRuleHistory.rejected, (state, action) => {
         state.loading = false;
