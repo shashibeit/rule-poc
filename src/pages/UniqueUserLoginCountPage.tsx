@@ -1,20 +1,20 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { Box, Button, TextField, Typography ,Grid} from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { AppDataGrid } from '@/components/datagrid/AppDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchUniqueUserLoginAll, fetchUniqueUserLoginSearch, setUniqueUserLoginPagination } from '@/features/reports/uniqueUserLoginSlice';
+import { fetchUniqueUserLoginAllData, fetchUniqueUserLoginSearchData } from '@/features/reports/uniqueUserLoginSlice';
 import { UniqueUserLoginRecord } from '@/types';
 
 interface UniqueUserLoginHeaderProps {
   clientId: string;
-  portfolioName: string;
+  fiShortName: string;
   errors: {
     clientId?: string;
-    portfolioName?: string;
+    fiShortName?: string;
   };
   onClientIdChange: (value: string) => void;
-  onPortfolioNameChange: (value: string) => void;
+  onFiShortNameChange: (value: string) => void;
   onSearch: () => void;
   onSearchAll: () => void;
   onClear: () => void;
@@ -22,10 +22,10 @@ interface UniqueUserLoginHeaderProps {
 
 const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
   clientId,
-  portfolioName,
+  fiShortName,
   errors,
   onClientIdChange,
-  onPortfolioNameChange,
+  onFiShortNameChange,
   onSearch,
   onSearchAll,
   onClear,
@@ -52,11 +52,11 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
           <TextField
             fullWidth
             size="small"
-            label="Portfolio Name"
-            value={portfolioName}
-            onChange={(e) => onPortfolioNameChange(e.target.value)}
-            error={!!errors.portfolioName}
-            helperText={errors.portfolioName}
+            label="FI Short Name"
+            value={fiShortName}
+            onChange={(e) => onFiShortNameChange(e.target.value)}
+            error={!!errors.fiShortName}
+            helperText={errors.fiShortName}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 5 }}>
@@ -77,18 +77,18 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
   );
 };
 
-const UniqueUserLoginGrid = withDataGrid<UniqueUserLoginHeaderProps>(UniqueUserLoginHeader);
-
 export const UniqueUserLoginCountPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, total, loading, pagination } = useAppSelector((state) => state.uniqueUserLogin);
+  const { records, loading } = useAppSelector((state) => state.uniqueUserLogin);
 
   const [clientId, setClientId] = useState('');
-  const [portfolioName, setPortfolioName] = useState('');
+  const [fiShortName, setFiShortName] = useState('');
   const [hasApplied, setHasApplied] = useState(false);
   const [mode, setMode] = useState<'search' | 'all'>('search');
-  const [errors, setErrors] = useState<{ clientId?: string; portfolioName?: string }>({});
-  const [applied, setApplied] = useState({ clientId: '', portfolioName: '' });
+  const [errors, setErrors] = useState<{ clientId?: string; fiShortName?: string }>({});
+  const [applied, setApplied] = useState({ clientId: '', fiShortName: '' });
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
     if (!hasApplied) {
@@ -96,99 +96,92 @@ export const UniqueUserLoginCountPage: FC = () => {
     }
 
     if (mode === 'all') {
-      dispatch(
-        fetchUniqueUserLoginAll({
-          page: pagination.page,
-          pageSize: pagination.pageSize,
-        })
-      );
+      dispatch(fetchUniqueUserLoginAllData());
     } else {
       dispatch(
-        fetchUniqueUserLoginSearch({
-          page: pagination.page,
-          pageSize: pagination.pageSize,
+        fetchUniqueUserLoginSearchData({
           clientId: applied.clientId || undefined,
-          portfolioName: applied.portfolioName || undefined,
+          fiShortName: applied.fiShortName || undefined,
         })
       );
     }
-  }, [dispatch, pagination.page, pagination.pageSize, applied, hasApplied, mode]);
+  }, [dispatch, applied, hasApplied, mode]);
 
   const columns = useMemo<GridColDef<UniqueUserLoginRecord>[]>(
     () => [
+      { field: 'loginDate', headerName: 'Login Date', width: 130 },
+      { field: 'loginHour', headerName: 'Login Hour', width: 120 },
+      { field: 'loginCount', headerName: 'Login Count', width: 130 },
       { field: 'time', headerName: 'Time', width: 120 },
-      { field: 'day6', headerName: 'Day 6', width: 110 },
-      { field: 'day5a', headerName: 'Day 5', width: 110 },
-      { field: 'day5b', headerName: 'Day 5', width: 110 },
-      { field: 'day4', headerName: 'Day 4', width: 110 },
-      { field: 'day3', headerName: 'Day 3', width: 110 },
-      { field: 'day2', headerName: 'Day 2', width: 110 },
       { field: 'day1', headerName: 'Day 1', width: 110 },
-      { field: 'day0', headerName: 'Day 0', width: 110 },
+      { field: 'day2', headerName: 'Day 2', width: 110 },
+      { field: 'day3', headerName: 'Day 3', width: 110 },
+      { field: 'day5', headerName: 'Day 5', width: 110 },
+      { field: 'day6', headerName: 'Day 6', width: 110 },
+      { field: 'day7', headerName: 'Day 7', width: 110 },
     ],
     []
   );
 
-  const props: DataGridViewProps = {
-    rows: hasApplied ? records : [],
-    columns,
-    rowCount: hasApplied ? total : 0,
-    loading: hasApplied ? loading : false,
-    page: pagination.page,
-    pageSize: pagination.pageSize,
-    onPageChange: (newPage) => dispatch(setUniqueUserLoginPagination({ page: newPage })),
-    onPageSizeChange: (newPageSize) =>
-      dispatch(setUniqueUserLoginPagination({ page: 0, pageSize: newPageSize })),
-  };
-
   return (
-    <UniqueUserLoginGrid
-      {...props}
-      clientId={clientId}
-      portfolioName={portfolioName}
-      errors={errors}
-      onClientIdChange={(value) => {
-        if (value === '' || /^[0-9]+$/.test(value)) {
-          setClientId(value);
-        }
-      }}
-      onPortfolioNameChange={setPortfolioName}
-      onSearch={() => {
-        const nextErrors: { clientId?: string; portfolioName?: string } = {};
-        const hasClientId = clientId.trim().length > 0;
-        const hasPortfolio = portfolioName.trim().length > 0;
+    <Box sx={{ p: 2 }}>
+      <UniqueUserLoginHeader
+        clientId={clientId}
+        fiShortName={fiShortName}
+        errors={errors}
+        onClientIdChange={(value) => {
+          if (value === '' || /^[0-9]+$/.test(value)) {
+            setClientId(value);
+          }
+        }}
+        onFiShortNameChange={setFiShortName}
+        onSearch={() => {
+          const nextErrors: { clientId?: string; fiShortName?: string } = {};
+          const hasClientId = clientId.trim().length > 0;
+          const hasFiShortName = fiShortName.trim().length > 0;
 
-        if (!hasClientId && !hasPortfolio) {
-          nextErrors.clientId = 'Client Id or Portfolio Name is required';
-          nextErrors.portfolioName = 'Client Id or Portfolio Name is required';
-        }
+          if (!hasClientId && !hasFiShortName) {
+            nextErrors.clientId = 'Client Id or FI Short Name is required';
+            nextErrors.fiShortName = 'Client Id or FI Short Name is required';
+          }
 
-        setErrors(nextErrors);
-        if (Object.keys(nextErrors).length > 0) {
-          return;
-        }
+          setErrors(nextErrors);
+          if (Object.keys(nextErrors).length > 0) {
+            return;
+          }
 
-        setApplied({ clientId: clientId.trim(), portfolioName: portfolioName.trim() });
-        setMode('search');
-        setHasApplied(true);
-        dispatch(setUniqueUserLoginPagination({ page: 0 }));
-      }}
-      onSearchAll={() => {
-        setErrors({});
-        setApplied({ clientId: '', portfolioName: '' });
-        setMode('all');
-        setHasApplied(true);
-        dispatch(setUniqueUserLoginPagination({ page: 0 }));
-      }}
-      onClear={() => {
-        setClientId('');
-        setPortfolioName('');
-        setErrors({});
-        setApplied({ clientId: '', portfolioName: '' });
-        setMode('search');
-        setHasApplied(false);
-        dispatch(setUniqueUserLoginPagination({ page: 0 }));
-      }}
-    />
+          setApplied({ clientId: clientId.trim(), fiShortName: fiShortName.trim() });
+          setMode('search');
+          setHasApplied(true);
+        }}
+        onSearchAll={() => {
+          setErrors({});
+          setApplied({ clientId: '', fiShortName: '' });
+          setMode('all');
+          setHasApplied(true);
+        }}
+        onClear={() => {
+          setClientId('');
+          setFiShortName('');
+          setErrors({});
+          setApplied({ clientId: '', fiShortName: '' });
+          setMode('search');
+          setHasApplied(false);
+        }}
+      />
+      <Box sx={{ mt: 2, width: '100%', maxWidth: '100%' }}>
+        <AppDataGrid
+          rows={hasApplied ? records : []}
+          columns={columns}
+          loading={hasApplied ? loading : false}
+          clientSidePagination={true}
+          searchFields={['loginDate', 'loginHour', 'loginCount', 'time']}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      </Box>
+    </Box>
   );
 };

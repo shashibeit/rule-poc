@@ -307,6 +307,58 @@ export function makeServer() {
         };
       });
 
+      // User Login Count Report - POST only endpoint
+      this.post('/rules/v1/userLoginCountReport', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { clientId = '', fiShortName = '' } = body;
+
+        const clients = [
+          { clientId: '1001', fiShortName: 'ALPHA_FI' },
+          { clientId: '1002', fiShortName: 'BETA_FI' },
+          { clientId: '1003', fiShortName: 'GAMMA_FI' },
+        ];
+
+        // Generate more data for client-side pagination
+        let data = Array.from({ length: 120 }, (_v, i) => {
+          const client = clients[i % clients.length];
+          const date = new Date();
+          date.setDate(date.getDate() - (i % 30));
+          const hour = (i % 24).toString().padStart(2, '0');
+          
+          return {
+            id: String(i + 1),
+            loginDate: date.toISOString().split('T')[0],
+            loginHour: `${hour}:00`,
+            loginCount: String((i + 10) % 100),
+            time: `${hour}:00`,
+            day1: String((i + 1) % 50),
+            day2: String((i + 2) % 50),
+            day3: String((i + 3) % 50),
+            day5: String((i + 5) % 50),
+            day6: String((i + 6) % 50),
+            day7: String((i + 7) % 50),
+            clientId: client.clientId,
+            fiShortName: client.fiShortName,
+          };
+        });
+
+        if (clientId) {
+          data = data.filter((row) => row.clientId === String(clientId));
+        }
+
+        if (fiShortName) {
+          const lower = String(fiShortName).toLowerCase();
+          data = data.filter((row) => row.fiShortName.toLowerCase().includes(lower));
+        }
+
+        return {
+          code: '200',
+          message: 'Success',
+          responseList: data,
+          total: data.length,
+        };
+      });
+
       this.get('/reports/unique-user-logins', (_schema, request) => {
         const { page = '0', pageSize = '10' } = request.queryParams;
         const pageNum = parseInt(String(page));
@@ -402,6 +454,41 @@ export function makeServer() {
         };
       });
 
+      // New Rule Count API
+      this.post('/rules/v1/getRuleCount', (_schema, request) => {
+        const body = JSON.parse(request.requestBody);
+        const { ruleTime } = body;
+
+        const categories = ['Authorization', 'Fraud', 'Compliance', 'Limits', 'Scoring'];
+        const ruleSets = ['Core Rules', 'Risk Rules', 'Velocity Rules', 'Whitelist Rules', 'Blacklist Rules'];
+        const actions = ['Added', 'Updated', 'Deleted'];
+
+        let totalRecords = 45;
+        
+        // Simulate filtering based on ruleTime
+        if (ruleTime === 'Noon') {
+          totalRecords = 15;
+        } else if (ruleTime === 'Evening') {
+          totalRecords = 20;
+        } else if (ruleTime === 'Emergency') {
+          totalRecords = 10;
+        }
+
+        const ruleCountList = Array.from({ length: totalRecords }, (_v, i) => ({
+          ruleCategory: categories[i % categories.length],
+          ruleSet: ruleSets[i % ruleSets.length],
+          ruleAction: actions[i % actions.length],
+          ruleCount: 10 + (i % 20),
+        }));
+
+        return {
+          code: '00',
+          message: 'Success',
+          ruleCountList,
+        };
+      });
+
+      // Legacy Rule Count API (keeping for backward compatibility)
       this.get('/reports/rule-count', (_schema, request) => {
         const { page = '0', pageSize = '10', runWindow = '', date = '' } = request.queryParams;
         const pageNum = parseInt(String(page));
@@ -505,7 +592,6 @@ export function makeServer() {
           ruleDateTo = '',
           pageNum = 0,
           pageSize = 10,
-          counter = 0,
           ruleName = '',
           ruleTime = '',
         } = body;
@@ -811,16 +897,14 @@ export function makeServer() {
           };
         });
 
-        const total = data.length;
         const start = pageNum * pageSizeNum;
         const end = start + pageSizeNum;
         const paginated = data.slice(start, end);
 
         return {
-          data: paginated,
-          total,
-          page: pageNum,
-          pageSize: pageSizeNum,
+          code: '00',
+          message: 'Success',
+          StagingRefreshHistoryList: paginated,
         };
       });
 
@@ -857,8 +941,9 @@ export function makeServer() {
         });
 
         return {
-          data,
-          total: data.length,
+          code: '00',
+          message: 'Success',
+          StagingRefreshHistoryList: data,
         };
       });
 

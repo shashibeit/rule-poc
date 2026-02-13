@@ -22,25 +22,35 @@ const initialState: UniqueUserLoginState = {
   },
 };
 
-export const fetchUniqueUserLoginAll = createAsyncThunk(
-  'reports/fetchUniqueUserLoginAll',
-  async (params: { page: number; pageSize: number }) => {
-    const response = await apiClient.get<{
-      data: UniqueUserLoginRecord[];
+export const fetchUniqueUserLoginAllData = createAsyncThunk(
+  'reports/fetchUniqueUserLoginAllData',
+  async () => {
+    const response = await apiClient.post<{
+      code: string;
+      message: string;
+      responseList: UniqueUserLoginRecord[];
       total: number;
-    }>('/reports/unique-user-logins', params);
-    return response;
+    }>('/rules/v1/userLoginCountReport', {});
+    return {
+      data: response.responseList,
+      total: response.total || response.responseList.length,
+    };
   }
 );
 
-export const fetchUniqueUserLoginSearch = createAsyncThunk(
-  'reports/fetchUniqueUserLoginSearch',
-  async (params: { page: number; pageSize: number; clientId?: string; portfolioName?: string }) => {
+export const fetchUniqueUserLoginSearchData = createAsyncThunk(
+  'reports/fetchUniqueUserLoginSearchData',
+  async (params: { clientId?: string; fiShortName?: string }) => {
     const response = await apiClient.post<{
-      data: UniqueUserLoginRecord[];
+      code: string;
+      message: string;
+      responseList: UniqueUserLoginRecord[];
       total: number;
-    }>('/reports/unique-user-logins/search', params);
-    return response;
+    }>('/rules/v1/userLoginCountReport', params);
+    return {
+      data: response.responseList,
+      total: response.total || response.responseList.length,
+    };
   }
 );
 
@@ -54,29 +64,29 @@ const uniqueUserLoginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUniqueUserLoginAll.pending, (state) => {
+      .addCase(fetchUniqueUserLoginAllData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUniqueUserLoginAll.fulfilled, (state, action) => {
+      .addCase(fetchUniqueUserLoginAllData.fulfilled, (state, action) => {
         state.loading = false;
         state.records = action.payload.data;
         state.total = action.payload.total;
       })
-      .addCase(fetchUniqueUserLoginAll.rejected, (state, action) => {
+      .addCase(fetchUniqueUserLoginAllData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load unique user login report';
       })
-      .addCase(fetchUniqueUserLoginSearch.pending, (state) => {
+      .addCase(fetchUniqueUserLoginSearchData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUniqueUserLoginSearch.fulfilled, (state, action) => {
+      .addCase(fetchUniqueUserLoginSearchData.fulfilled, (state, action) => {
         state.loading = false;
         state.records = action.payload.data;
         state.total = action.payload.total;
       })
-      .addCase(fetchUniqueUserLoginSearch.rejected, (state, action) => {
+      .addCase(fetchUniqueUserLoginSearchData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load unique user login report';
       });

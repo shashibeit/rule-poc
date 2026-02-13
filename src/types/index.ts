@@ -28,17 +28,16 @@ export interface UserReportRecord {
 
 export interface UniqueUserLoginRecord {
   id: string;
+  loginDate: string;
+  loginHour: string;
+  loginCount: string;
   time: string;
-  day6: number;
-  day5a: number;
-  day5b: number;
-  day4: number;
-  day3: number;
-  day2: number;
-  day1: number;
-  day0: number;
-  clientId?: string;
-  portfolioName?: string;
+  day1: string;
+  day2: string;
+  day3: string;
+  day5: string;
+  day6: string;
+  day7: string;
 }
 
 export interface RuleCountRecord {

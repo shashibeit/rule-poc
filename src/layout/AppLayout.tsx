@@ -12,7 +12,7 @@ export const AppLayout: FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex',backgroundColor: (theme) => theme.palette.background.default }}>
       <TopBar onMenuClick={handleDrawerToggle} />
       
       {/* Mobile drawer */}

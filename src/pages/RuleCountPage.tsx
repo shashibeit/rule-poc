@@ -4,9 +4,9 @@ import { GridColDef } from '@mui/x-data-grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
-import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { AppDataGrid } from '@/components/datagrid/AppDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchRuleCount, setRuleCountPagination } from '@/features/reports/ruleCountSlice';
+import { fetchRuleCountAllData } from '@/features/reports/ruleCountSlice';
 import { RuleCountRecord } from '@/types';
 
 interface RuleCountHeaderProps {
@@ -90,17 +90,17 @@ const RuleCountHeader: FC<RuleCountHeaderProps> = ({
   );
 };
 
-const RuleCountGrid = withDataGrid<RuleCountHeaderProps>(RuleCountHeader);
-
 export const RuleCountPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, total, loading, pagination } = useAppSelector((state) => state.ruleCount);
+  const { records, loading } = useAppSelector((state) => state.ruleCount);
 
   const [date, setDate] = useState<Dayjs | null>(null);
   const [runWindow, setRunWindow] = useState('');
   const [errors, setErrors] = useState<{ date?: string; runWindow?: string }>({});
   const [hasApplied, setHasApplied] = useState(false);
   const [applied, setApplied] = useState({ date: null as Dayjs | null, runWindow: '' });
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
     if (!hasApplied) {
@@ -108,14 +108,12 @@ export const RuleCountPage: FC = () => {
     }
 
     dispatch(
-      fetchRuleCount({
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-        runWindow: applied.runWindow,
-        date: applied.date ? applied.date.format('YYYY-MM-DD') : '',
+      fetchRuleCountAllData({
+        ruleDateTo: applied.date ? applied.date.format('DD-MMM-YYYY').toUpperCase() : '',
+        ruleTime: applied.runWindow,
       })
     );
-  }, [dispatch, pagination.page, pagination.pageSize, applied, hasApplied]);
+  }, [dispatch, applied, hasApplied]);
 
   const columns = useMemo<GridColDef<RuleCountRecord>[]>(
     () => [
@@ -127,53 +125,56 @@ export const RuleCountPage: FC = () => {
     []
   );
 
-  const props: DataGridViewProps = {
-    rows: hasApplied ? records : [],
-    columns,
-    rowCount: hasApplied ? total : 0,
-    loading: hasApplied ? loading : false,
-    page: pagination.page,
-    pageSize: pagination.pageSize,
-    onPageChange: (newPage) => dispatch(setRuleCountPagination({ page: newPage })),
-    onPageSizeChange: (newPageSize) =>
-      dispatch(setRuleCountPagination({ page: 0, pageSize: newPageSize })),
-  };
-
   return (
-    <RuleCountGrid
-      {...props}
-      date={date}
-      runWindow={runWindow}
-      errors={errors}
-      onDateChange={setDate}
-      onRunWindowChange={setRunWindow}
-      onSearch={() => {
-        const nextErrors: { date?: string; runWindow?: string } = {};
+    <Box>
+      <RuleCountHeader
+        date={date}
+        runWindow={runWindow}
+        errors={errors}
+        onDateChange={setDate}
+        onRunWindowChange={setRunWindow}
+        onSearch={() => {
+          const nextErrors: { date?: string; runWindow?: string } = {};
 
-        if (!date) {
-          nextErrors.date = 'Date is required';
-        }
-        if (!runWindow) {
-          nextErrors.runWindow = 'Run Window is required';
-        }
+          if (!date) {
+            nextErrors.date = 'Date is required';
+          }
+          if (!runWindow) {
+            nextErrors.runWindow = 'Run Window is required';
+          }
 
-        setErrors(nextErrors);
-        if (Object.keys(nextErrors).length > 0) {
-          return;
-        }
+          setErrors(nextErrors);
+          if (Object.keys(nextErrors).length > 0) {
+            return;
+          }
 
-        setApplied({ date, runWindow });
-        setHasApplied(true);
-        dispatch(setRuleCountPagination({ page: 0 }));
-      }}
-      onClear={() => {
-        setDate(null);
-        setRunWindow('');
-        setErrors({});
-        setApplied({ date: null, runWindow: '' });
-        setHasApplied(false);
-        dispatch(setRuleCountPagination({ page: 0 }));
-      }}
-    />
+          setApplied({ date, runWindow });
+          setHasApplied(true);
+          setPage(0);
+        }}
+        onClear={() => {
+          setDate(null);
+          setRunWindow('');
+          setErrors({});
+          setApplied({ date: null, runWindow: '' });
+          setHasApplied(false);
+          setPage(0);
+        }}
+      />
+      
+      <Box sx={{ mt: 2 }}>
+        <AppDataGrid
+          rows={hasApplied ? records : []}
+          columns={columns}
+          loading={hasApplied ? loading : false}
+          clientSidePagination={true}
+          searchFields={['ruleCategoryName', 'ruleSetName', 'action']}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      </Box>
+    </Box>
   );
 };

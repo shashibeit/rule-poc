@@ -26,8 +26,9 @@ export const fetchOperationHistory = createAsyncThunk(
   'reports/fetchOperationHistory',
   async (params: { page: number; pageSize: number; operationType: string }) => {
     const response = await apiClient.get<{
-      data: OperationHistoryRecord[];
-      total: number;
+      code: string;
+      message: string;
+      StagingRefreshHistoryList: OperationHistoryRecord[];
     }>(`/rules/v1/refreshHistory/${params.operationType}`, {
       page: params.page,
       pageSize: params.pageSize
@@ -40,8 +41,9 @@ export const fetchOperationHistoryAll = createAsyncThunk(
   'reports/fetchOperationHistoryAll',
   async (params: { operationType: string }) => {
     const response = await apiClient.get<{
-      data: OperationHistoryRecord[];
-      total: number;
+      code: string;
+      message: string;
+      StagingRefreshHistoryList: OperationHistoryRecord[];
     }>(`/rules/v1/refreshHistory/${params.operationType}/all`);
     return response;
   }
@@ -63,8 +65,8 @@ const operationHistorySlice = createSlice({
       })
       .addCase(fetchOperationHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload.data;
-        state.total = action.payload.total;
+        state.records = action.payload.StagingRefreshHistoryList || [];
+        state.total = action.payload.StagingRefreshHistoryList?.length || 0;
       })
       .addCase(fetchOperationHistory.rejected, (state, action) => {
         state.loading = false;
@@ -76,8 +78,8 @@ const operationHistorySlice = createSlice({
       })
       .addCase(fetchOperationHistoryAll.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload.data;
-        state.total = action.payload.total;
+        state.records = action.payload.StagingRefreshHistoryList || [];
+        state.total = action.payload.StagingRefreshHistoryList?.length || 0;
       })
       .addCase(fetchOperationHistoryAll.rejected, (state, action) => {
         state.loading = false;
