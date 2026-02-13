@@ -50,7 +50,7 @@ export const fetchRuleHistory = createAsyncThunk(
       pageNum: params.page,
       pageSize: params.pageSize,
       counter: 0, // Default counter value
-      ruleName: params.ruleName || '',
+      ...(params.ruleName && { ruleName: params.ruleName }),
       ruleTime: params.runWindow || '',
     };
 

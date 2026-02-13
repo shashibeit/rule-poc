@@ -108,18 +108,31 @@ export const UniqueUserLoginCountPage: FC = () => {
   }, [dispatch, applied, hasApplied, mode]);
 
   const columns = useMemo<GridColDef<UniqueUserLoginRecord>[]>(
-    () => [
-      { field: 'loginDate', headerName: 'Login Date', width: 130 },
-      { field: 'loginHour', headerName: 'Login Hour', width: 120 },
-      { field: 'loginCount', headerName: 'Login Count', width: 130 },
-      { field: 'time', headerName: 'Time', width: 120 },
-      { field: 'day1', headerName: 'Day 1', width: 110 },
-      { field: 'day2', headerName: 'Day 2', width: 110 },
-      { field: 'day3', headerName: 'Day 3', width: 110 },
-      { field: 'day5', headerName: 'Day 5', width: 110 },
-      { field: 'day6', headerName: 'Day 6', width: 110 },
-      { field: 'day7', headerName: 'Day 7', width: 110 },
-    ],
+    () => {
+      // Generate headers with actual dates (last 7 days from today)
+      const today = new Date();
+      const getDayHeader = (daysAgo: number) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - daysAgo);
+        const day = date.getDate();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      };
+      
+      return [
+        { field: 'time', headerName: 'Time', width: 120 },
+        { field: 'day7', headerName: getDayHeader(6), width: 110 }, // 7 days ago
+        { field: 'day6', headerName: getDayHeader(5), width: 110 }, // 6 days ago  
+        { field: 'day5', headerName: getDayHeader(4), width: 110 }, // 5 days ago
+        { field: 'day4', headerName: getDayHeader(3), width: 110 }, // 4 days ago
+        { field: 'day3', headerName: getDayHeader(2), width: 110 }, // 3 days ago
+        { field: 'day2', headerName: getDayHeader(1), width: 110 }, // 2 days ago
+        { field: 'day1', headerName: getDayHeader(0), width: 110 }, // today
+      ];
+    },
     []
   );
 

@@ -318,37 +318,58 @@ export function makeServer() {
           { clientId: '1003', fiShortName: 'GAMMA_FI' },
         ];
 
-        // Generate more data for client-side pagination
-        let data = Array.from({ length: 120 }, (_v, i) => {
-          const client = clients[i % clients.length];
-          const date = new Date();
-          date.setDate(date.getDate() - (i % 30));
-          const hour = (i % 24).toString().padStart(2, '0');
-          
-          return {
-            id: String(i + 1),
-            loginDate: date.toISOString().split('T')[0],
-            loginHour: `${hour}:00`,
-            loginCount: String((i + 10) % 100),
-            time: `${hour}:00`,
-            day1: String((i + 1) % 50),
-            day2: String((i + 2) % 50),
-            day3: String((i + 3) % 50),
-            day5: String((i + 5) % 50),
-            day6: String((i + 6) % 50),
-            day7: String((i + 7) % 50),
-            clientId: client.clientId,
-            fiShortName: client.fiShortName,
-          };
-        });
+        // Generate hourly data (00:00 to 23:00) plus Total row
+        const timeSlots = [];
+        
+        // Add hourly slots
+        for (let hour = 0; hour < 24; hour++) {
+          const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+          timeSlots.push({
+            id: `hour-${hour}`,
+            loginDate: new Date().toISOString().split('T')[0],
+            loginHour: timeStr,
+            loginCount: String(Math.floor(Math.random() * 50) + 10),
+            time: timeStr,
+            day1: String(Math.floor(Math.random() * 30) + 5), // today
+            day2: String(Math.floor(Math.random() * 30) + 5), // yesterday  
+            day3: String(Math.floor(Math.random() * 30) + 5), // 2 days ago
+            day4: String(Math.floor(Math.random() * 30) + 5), // 3 days ago
+            day5: String(Math.floor(Math.random() * 30) + 5), // 4 days ago
+            day6: String(Math.floor(Math.random() * 30) + 5), // 5 days ago
+            day7: String(Math.floor(Math.random() * 30) + 5), // 6 days ago
+            clientId: clients[hour % clients.length].clientId,
+            fiShortName: clients[hour % clients.length].fiShortName,
+          });
+        }
+        
+        // Add Total row
+        const totalRow = {
+          id: 'total',
+          loginDate: new Date().toISOString().split('T')[0],
+          loginHour: 'Total',
+          loginCount: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.loginCount), 0)),
+          time: 'Total',
+          day1: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day1), 0)),
+          day2: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day2), 0)),
+          day3: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day3), 0)),
+          day4: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day4), 0)),
+          day5: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day5), 0)),
+          day6: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day6), 0)),
+          day7: String(timeSlots.reduce((sum, slot) => sum + parseInt(slot.day7), 0)),
+          clientId: '',
+          fiShortName: '',
+        };
+        
+        timeSlots.push(totalRow);
+        let data = timeSlots;
 
         if (clientId) {
-          data = data.filter((row) => row.clientId === String(clientId));
+          data = data.filter((row) => row.clientId === String(clientId) || row.id === 'total');
         }
 
         if (fiShortName) {
           const lower = String(fiShortName).toLowerCase();
-          data = data.filter((row) => row.fiShortName.toLowerCase().includes(lower));
+          data = data.filter((row) => row.fiShortName.toLowerCase().includes(lower) || row.id === 'total');
         }
 
         return {
