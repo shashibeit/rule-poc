@@ -11,6 +11,8 @@ import {
 import { Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchCompromisedIdByPan, PanSearchRecord } from '@/features/reports/searchCgUsingPanSlice';
 
 interface SearchCgUsingPanHeaderProps {
   mode: 'single' | 'multiple';
@@ -104,69 +106,29 @@ const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
 
 const SearchCgUsingPanGrid = withDataGrid<SearchCgUsingPanHeaderProps>(SearchCgUsingPanHeader);
 
-interface PanResultRecord {
-  id: string;
-  fiChecked: boolean;
-  tokenizedPan: string;
-  compromiseIncidentId: string;
-  remark: string;
-}
-
-const MOCK_ROWS: PanResultRecord[] = [
-  {
-    id: '1',
-    fiChecked: false,
-    tokenizedPan: 'TK-0001',
-    compromiseIncidentId: 'CI-1001',
-    remark: 'Verified',
-  },
-  {
-    id: '2',
-    fiChecked: false,
-    tokenizedPan: 'TK-0002',
-    compromiseIncidentId: 'CI-1002',
-    remark: 'Pending',
-  },
-  {
-    id: '3',
-    fiChecked: false,
-    tokenizedPan: 'TK-0003',
-    compromiseIncidentId: 'CI-1003',
-    remark: 'Reviewed',
-  },
-];
-
 export const SearchCgUsingPanPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { records, loading, error } = useAppSelector((state) => state.searchCgUsingPan);
   const [mode, setMode] = useState<'single' | 'multiple'>('single');
   const [tokenizedPan, setTokenizedPan] = useState('');
   const [fileName, setFileName] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [rows, setRows] = useState<PanResultRecord[]>([]);
+  const [validationError, setValidationError] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const columns = useMemo<GridColDef<PanResultRecord>[]>(
+  const columns = useMemo<GridColDef<PanSearchRecord>[]>(
     () => [
-      {
-        field: 'fiChecked',
-        headerName: 'FI Checked',
-        width: 120,
-        renderCell: () => <input type="checkbox" />,
-        sortable: false,
-        filterable: false,
-      },
-      { field: 'tokenizedPan', headerName: 'Tokenized PAN(s)', width: 180 },
-      { field: 'compromiseIncidentId', headerName: 'Compromised Incident ID', width: 220 },
-      { field: 'remark', headerName: 'Remark', width: 180 },
+      { field: 'pan', headerName: 'PAN', width: 220 },
+      { field: 'remarks', headerName: 'Remark', width: 220 },
     ],
     []
   );
 
   const props: DataGridViewProps = {
-    rows,
+    rows: records,
     columns,
-    rowCount: rows.length,
-    loading: false,
+    rowCount: records.length,
+    loading,
     page,
     pageSize,
     onPageChange: (newPage) => setPage(newPage),
@@ -182,13 +144,12 @@ export const SearchCgUsingPanPage: FC = () => {
       mode={mode}
       tokenizedPan={tokenizedPan}
       fileName={fileName}
-      error={error}
+      error={validationError || error || undefined}
       onModeChange={(nextMode) => {
         setMode(nextMode);
-        setError(undefined);
+        setValidationError(undefined);
         setTokenizedPan('');
         setFileName('');
-        setRows([]);
         setPage(0);
       }}
       onTokenizedPanChange={setTokenizedPan}
@@ -199,24 +160,21 @@ export const SearchCgUsingPanPage: FC = () => {
         if (mode === 'single') {
           const trimmed = tokenizedPan.trim();
           if (!trimmed) {
-            setError('Tokenized PAN is required');
-            setRows([]);
+            setValidationError('Tokenized PAN is required');
             return;
           }
-          setError(undefined);
-          setRows(MOCK_ROWS.filter((row) => row.tokenizedPan === trimmed));
+          setValidationError(undefined);
+          dispatch(fetchCompromisedIdByPan([trimmed]));
           setPage(0);
           return;
         }
 
         if (!fileName) {
-          setError('Search By Tokenized PAN Details file is required');
-          setRows([]);
+          setValidationError('Search By Tokenized PAN Details file is required');
           return;
         }
 
-        setError(undefined);
-        setRows(MOCK_ROWS);
+        setValidationError('Multiple PAN upload is not supported yet');
         setPage(0);
       }}
     />

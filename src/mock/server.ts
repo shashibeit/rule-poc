@@ -639,6 +639,21 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/compromisedIdByPan', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '[]');
+        const pans = Array.isArray(body) ? body : [];
+        const responseList = pans.map((pan) => ({
+          pan: String(pan),
+          remarks: 'No Associated Card Group',
+        }));
+
+        return {
+          code: 'Success',
+          message: 'Success',
+          responseList,
+        };
+      });
+
       this.get('/reports/unique-user-logins', (_schema, request) => {
         const { page = '0', pageSize = '10' } = request.queryParams;
         const pageNum = parseInt(String(page));
