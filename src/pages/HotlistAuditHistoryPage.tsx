@@ -15,6 +15,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchHotlistAuditLogs, HotlistAuditRecord } from '@/features/reports/hotlistAuditHistorySlice';
 
 interface HotlistAuditHeaderProps {
   mode: 'fi' | 'emergency' | 'risky';
@@ -276,55 +278,9 @@ const HotlistAuditHeader: FC<HotlistAuditHeaderProps> = ({
 
 const HotlistAuditGrid = withDataGrid<HotlistAuditHeaderProps>(HotlistAuditHeader);
 
-interface HotlistAuditRecord {
-  id: string;
-  clientId: string;
-  portfolioName: string;
-  hotlistName: string;
-  action: string;
-  valueFrom: string;
-  valueTo: string;
-  changedByUser: string;
-  timeModified: string;
-}
-
-const MOCK_ROWS: HotlistAuditRecord[] = [
-  {
-    id: '1',
-    clientId: '1001',
-    portfolioName: 'Alpha',
-    hotlistName: 'TGHL_CORE_FI',
-    action: 'Updated',
-    valueFrom: 'Key=A1; Value=Enabled; From=2026-01-10; To=2026-02-01; Status=Active',
-    valueTo: 'Key=A1; Value=Disabled; From=2026-02-02; To=2026-03-01; Status=Inactive',
-    changedByUser: 'John Smith',
-    timeModified: '2026-02-06 11:45 AM',
-  },
-  {
-    id: '2',
-    clientId: '1002',
-    portfolioName: 'Beta',
-    hotlistName: 'EMERGENCY_CORE',
-    action: 'Added',
-    valueFrom: 'Key=E2; Value=Off; From=2026-01-01; To=2026-01-31; Status=Inactive',
-    valueTo: 'Key=E2; Value=On; From=2026-02-01; To=2026-02-28; Status=Active',
-    changedByUser: 'Jane Johnson',
-    timeModified: '2026-02-05 02:15 PM',
-  },
-  {
-    id: '3',
-    clientId: '1003',
-    portfolioName: 'Gamma',
-    hotlistName: 'RISKY_LITE',
-    action: 'Deleted',
-    valueFrom: 'Key=R3; Value=Enabled; From=2026-01-05; To=2026-02-10; Status=Active',
-    valueTo: 'Key=R3; Value=Removed; From=2026-02-11; To=2026-02-20; Status=Inactive',
-    changedByUser: 'Michael Brown',
-    timeModified: '2026-02-04 09:10 AM',
-  },
-];
-
 export const HotlistAuditHistoryPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { records, loading, error } = useAppSelector((state) => state.hotlistAuditHistory);
   const [mode, setMode] = useState<'fi' | 'emergency' | 'risky'>('fi');
   const [fiHotlistName, setFiHotlistName] = useState('');
   const [emergencyHotlistName, setEmergencyHotlistName] = useState('');
@@ -345,6 +301,8 @@ export const HotlistAuditHistoryPage: FC = () => {
     keyRuleName?: string;
   }>({});
   const [hasApplied, setHasApplied] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const columns = useMemo<GridColDef<HotlistAuditRecord>[]>(
     () => [
@@ -361,14 +319,18 @@ export const HotlistAuditHistoryPage: FC = () => {
   );
 
   const props: DataGridViewProps = {
-    rows: hasApplied ? MOCK_ROWS : [],
+    rows: hasApplied ? records : [],
     columns,
-    rowCount: hasApplied ? MOCK_ROWS.length : 0,
-    loading: false,
-    page: 0,
-    pageSize: 10,
-    onPageChange: () => undefined,
-    onPageSizeChange: () => undefined,
+    rowCount: hasApplied ? records.length : 0,
+    loading,
+    page,
+    pageSize,
+    onPageChange: (newPage) => setPage(newPage),
+    onPageSizeChange: (newPageSize) => {
+      setPage(0);
+      setPageSize(newPageSize);
+    },
+    clientSidePagination: true,
   };
 
   const handleSearch = () => {
@@ -406,7 +368,26 @@ export const HotlistAuditHistoryPage: FC = () => {
       return;
     }
 
+    const formattedFromDate = fromDate ? fromDate.format('D-MMM-YYYY').toUpperCase() : undefined;
+    const formattedToDate = toDate ? toDate.format('D-MMM-YYYY').toUpperCase() : undefined;
+    const trimmedUserName = userName.trim();
+    const trimmedPortfolioName = portfolioName.trim();
+
+    if (mode === 'fi') {
+      dispatch(
+        fetchHotlistAuditLogs({
+          hotListEntityKeyName: keyClientId.trim(),
+          hotListName: fiHotlistName,
+          fromDate: formattedFromDate,
+          toDate: formattedToDate,
+          changedByUser: trimmedUserName || undefined,
+          portFolioName: trimmedPortfolioName || undefined,
+        })
+      );
+    }
+
     setHasApplied(true);
+    setPage(0);
   };
 
   const handleClear = () => {
@@ -422,6 +403,7 @@ export const HotlistAuditHistoryPage: FC = () => {
     setToDate(null);
     setErrors({});
     setHasApplied(false);
+    setPage(0);
   };
 
   return (

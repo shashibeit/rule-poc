@@ -654,6 +654,61 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/getHotListAuditLogs', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { hotListEntityKeyName = '', hotListName = '' } = body;
+
+        const rows = [
+          {
+            clientId: '1224234',
+            portFolioName: 'Alpha',
+            hotListName: 'TGHL_CORE_FI',
+            action: 'Updated',
+            valueFrom: 'Key=A1; Value=Enabled',
+            valeuTo: 'Key=A1; Value=Disabled',
+            changedByUser: 'John Smith',
+            timeModified: '2026-02-06 11:45 AM',
+          },
+          {
+            clientId: '1224235',
+            portFolioName: 'Beta',
+            hotListName: 'TGHL_LITE_FI',
+            action: 'Added',
+            valueFrom: 'Key=B2; Value=Off',
+            valeuTo: 'Key=B2; Value=On',
+            changedByUser: 'Jane Johnson',
+            timeModified: '2026-02-05 02:15 PM',
+          },
+          {
+            clientId: '1224236',
+            portFolioName: 'Gamma',
+            hotListName: 'THGL_PROTECTBUY_FI',
+            action: 'Deleted',
+            valueFrom: 'Key=C3; Value=Enabled',
+            valeuTo: 'Key=C3; Value=Removed',
+            changedByUser: 'Michael Brown',
+            timeModified: '2026-02-04 09:10 AM',
+          },
+          {},
+        ];
+
+        let data = rows;
+
+        if (hotListEntityKeyName) {
+          data = data.filter((row: any) => String(row.clientId) === String(hotListEntityKeyName));
+        }
+
+        if (hotListName) {
+          data = data.filter((row: any) => String(row.hotListName) === String(hotListName));
+        }
+
+        return {
+          code: 'Success',
+          message: 'Success',
+          responseList: data,
+        };
+      });
+
       this.get('/reports/unique-user-logins', (_schema, request) => {
         const { page = '0', pageSize = '10' } = request.queryParams;
         const pageNum = parseInt(String(page));
