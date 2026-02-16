@@ -18,53 +18,7 @@ import {
   fetchFiHotlistAll,
   fetchFiHotlistSearch,
   HotlistRecord,
-  setFiHotlistRecords,
 } from '@/features/reports/fiHotlistCheckSlice';
-
-const MOCK_ROWS: HotlistRecord[] = [
-  {
-    id: '1',
-    clientId: '1001',
-    core: 'Yes',
-    lite: 'No',
-    liteBlocking: 'No',
-    protectBuy: 'Yes',
-    hotlistService: 'Enabled',
-    opServiceCode: 'OP-01',
-    validationStatus: 'Valid',
-    portfolioName: 'Alpha',
-    hotlistLastUpdatedBy: 'John Smith',
-    hotlistLastUpdatedOn: '2026-02-06 10:15 AM',
-  },
-  {
-    id: '2',
-    clientId: '1002',
-    core: 'Yes',
-    lite: 'Yes',
-    liteBlocking: 'Yes',
-    protectBuy: 'No',
-    hotlistService: 'Disabled',
-    opServiceCode: 'OP-07',
-    validationStatus: 'Pending',
-    portfolioName: 'Beta',
-    hotlistLastUpdatedBy: 'Jane Johnson',
-    hotlistLastUpdatedOn: '2026-02-05 02:40 PM',
-  },
-  {
-    id: '3',
-    clientId: '1003',
-    core: 'No',
-    lite: 'Yes',
-    liteBlocking: 'No',
-    protectBuy: 'Yes',
-    hotlistService: 'Enabled',
-    opServiceCode: 'OP-12',
-    validationStatus: 'Valid',
-    portfolioName: 'Gamma',
-    hotlistLastUpdatedBy: 'Michael Brown',
-    hotlistLastUpdatedOn: '2026-02-04 11:05 AM',
-  },
-];
 
 export const FiHotlistCheckPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -133,7 +87,7 @@ export const FiHotlistCheckPage: FC = () => {
     if (Object.keys(nextErrors).length > 0) {
       return;
     }
-    dispatch(setFiHotlistRecords(MOCK_ROWS));
+    dispatch(fetchFiHotlistAll());
   };
 
   const handleSearchByDate = () => {
