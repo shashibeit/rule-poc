@@ -586,6 +586,59 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/getCompromiseIdDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { compromiseIncidentId = '' } = body;
+
+        const rows = [
+          {
+            clientId: '1001',
+            portfolioName: 'Alpha',
+            compromiseIncidentId: 'A103',
+            count: 24,
+            updatedOn: '2026-02-06 10:15 AM',
+            updatedBy: 'John Smith',
+            ruleName: 'Velocity Rule',
+          },
+          {
+            clientId: '1002',
+            portfolioName: 'Beta',
+            compromiseIncidentId: 'B102',
+            count: 12,
+            updatedOn: '2026-02-06 02:40 PM',
+            updatedBy: 'Jane Johnson',
+            ruleName: 'Risk Rule',
+          },
+          {
+            clientId: '1003',
+            portfolioName: 'Gamma',
+            compromiseIncidentId: 'C101',
+            count: 35,
+            updatedOn: '2026-02-05 11:05 AM',
+            updatedBy: 'Michael Brown',
+            ruleName: 'Compliance Rule',
+          },
+          {
+            clientId: '1004',
+            portfolioName: 'Delta',
+            compromiseIncidentId: 'D104',
+            count: 8,
+            updatedOn: '2026-02-05 09:30 AM',
+            updatedBy: 'Sarah Wilson',
+            ruleName: 'Security Rule',
+          },
+        ];
+
+        const trimmed = String(compromiseIncidentId).trim();
+        const data = trimmed ? rows.filter((row) => row.compromiseIncidentId === trimmed) : rows;
+
+        return {
+          code: 'Success',
+          message: 'Success',
+          responseList: data,
+        };
+      });
+
       this.get('/reports/unique-user-logins', (_schema, request) => {
         const { page = '0', pageSize = '10' } = request.queryParams;
         const pageNum = parseInt(String(page));

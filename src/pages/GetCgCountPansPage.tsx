@@ -2,17 +2,8 @@ import { FC, useMemo, useState } from 'react';
 import { Box, Button, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
-
-interface CgCountRecord {
-  id: string;
-  clientId: string;
-  portfolioName: string;
-  compromiseIncidentId: string;
-  cardCount: number;
-  lastUpdatedOnEst: string;
-  lastUpdatedBy: string;
-  ruleName: string;
-}
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchCgCountPans, CgCountRecord } from '@/features/reports/getCgCountPansSlice';
 
 interface GetCgCountPansHeaderProps {
   compromiseIncidentId: string;
@@ -57,52 +48,11 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
 
 const GetCgCountPansGrid = withDataGrid<GetCgCountPansHeaderProps>(GetCgCountPansHeader);
 
-const MOCK_ROWS: CgCountRecord[] = [
-  {
-    id: '1',
-    clientId: '1001',
-    portfolioName: 'Alpha',
-    compromiseIncidentId: 'CI-001',
-    cardCount: 24,
-    lastUpdatedOnEst: '2026-02-06 10:15 AM',
-    lastUpdatedBy: 'John Smith',
-    ruleName: 'Velocity Rule',
-  },
-  {
-    // Simulate missing ID to test ID generation
-    clientId: '1002',
-    portfolioName: 'Beta',
-    compromiseIncidentId: 'CI-002',
-    cardCount: 12,
-    lastUpdatedOnEst: '2026-02-06 02:40 PM',
-    lastUpdatedBy: 'Jane Johnson',
-    ruleName: 'Risk Rule',
-  } as any,
-  {
-    id: '3',
-    clientId: '1003',
-    portfolioName: 'Gamma',
-    compromiseIncidentId: 'CI-003',
-    cardCount: 35,
-    lastUpdatedOnEst: '2026-02-05 11:05 AM',
-    lastUpdatedBy: 'Michael Brown',
-    ruleName: 'Compliance Rule',
-  },
-  {
-    // Another record without ID to test
-    clientId: '1004',
-    portfolioName: 'Delta',
-    compromiseIncidentId: 'CI-004',
-    cardCount: 8,
-    lastUpdatedOnEst: '2026-02-05 09:30 AM',
-    lastUpdatedBy: 'Sarah Wilson',
-    ruleName: 'Security Rule',
-  } as any,
-];
-
 export const GetCgCountPansPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { records, loading, error } = useAppSelector((state) => state.getCgCountPans);
   const [compromiseIncidentId, setCompromiseIncidentId] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [validationError, setValidationError] = useState<string | undefined>(undefined);
   const [hasApplied, setHasApplied] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -112,29 +62,18 @@ export const GetCgCountPansPage: FC = () => {
       { field: 'clientId', headerName: 'Client ID', width: 120 },
       { field: 'portfolioName', headerName: 'Portfolio Name', width: 160 },
       { field: 'compromiseIncidentId', headerName: 'Compromise Incident ID', width: 200 },
-      { field: 'cardCount', headerName: 'Card Count', width: 120, type: 'number' },
-      { field: 'lastUpdatedOnEst', headerName: 'Last updated on (EST)', width: 190 },
-      { field: 'lastUpdatedBy', headerName: 'Last Updated By', width: 160 },
+      { field: 'count', headerName: 'Card Count', width: 120, type: 'number' },
+      { field: 'updatedOn', headerName: 'Last updated on (EST)', width: 190 },
+      { field: 'updatedBy', headerName: 'Last Updated By', width: 160 },
       { field: 'ruleName', headerName: 'Rule Name', width: 160 },
     ],
     []
   );
 
-  const filteredRows = useMemo(() => {
-    if (!hasApplied) {
-      return [] as CgCountRecord[];
-    }
-    const trimmed = compromiseIncidentId.trim();
-    if (!trimmed) {
-      return [] as CgCountRecord[];
-    }
-    return MOCK_ROWS.filter((row) => row.compromiseIncidentId === trimmed);
-  }, [hasApplied, compromiseIncidentId]);
-
   const props: DataGridViewProps = {
-    rows: filteredRows,
+    rows: hasApplied ? records : [],
     columns,
-    loading: false,
+    loading,
     page,
     pageSize,
     onPageChange: (newPage) => setPage(newPage),
@@ -150,18 +89,24 @@ export const GetCgCountPansPage: FC = () => {
     <GetCgCountPansGrid
       {...props}
       compromiseIncidentId={compromiseIncidentId}
-      error={error}
+      error={validationError || error || undefined}
       onCompromiseIncidentIdChange={setCompromiseIncidentId}
       onSearch={() => {
         const trimmed = compromiseIncidentId.trim();
         if (!trimmed) {
-          setError('Compromise Incident ID is required');
+          setValidationError('Compromise Incident ID is required');
           setHasApplied(false);
           return;
         }
-        setError(undefined);
+        if (!/^[A-Za-z][0-9]{3}$/.test(trimmed)) {
+          setValidationError('Compromise Incident ID must be 1 letter followed by 3 digits');
+          setHasApplied(false);
+          return;
+        }
+        setValidationError(undefined);
         setHasApplied(true);
         setPage(0);
+        dispatch(fetchCgCountPans({ compromiseIncidentId: trimmed }));
       }}
     />
   );

@@ -10,6 +10,7 @@ import operationHistoryReducer from '@/features/reports/operationHistorySlice';
 import uniqueUserLoginReducer from '@/features/reports/uniqueUserLoginSlice';
 import ruleCountReducer from '@/features/reports/ruleCountSlice';
 import fiHotlistCheckReducer from '@/features/reports/fiHotlistCheckSlice';
+import getCgCountPansReducer from '@/features/reports/getCgCountPansSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -23,4 +24,5 @@ export const rootReducer = combineReducers({
   uniqueUserLogin: uniqueUserLoginReducer,
   ruleCount: ruleCountReducer,
   fiHotlistCheck: fiHotlistCheckReducer,
+  getCgCountPans: getCgCountPansReducer,
 });
