@@ -380,6 +380,92 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/getClientIdDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { clientId = '', portfolioName = '' } = body;
+
+        const rows = [
+          {
+            clientId: '1001',
+            core: 'Yes',
+            lite: 'No',
+            liteAndBlocking: 'No',
+            protectBuy: 'Yes',
+            hotlistService: 'Enabled',
+            dpServiceCode: 'DP-01',
+            validationStatus: 'Valid',
+            portfolioName: 'Alpha',
+            lastupdatedBy: 'John Smith',
+            lastUpdatedOn: '2026-02-06 10:15 AM',
+            searchDate: '2026-02-16',
+            hotListName: 'TGHL_CORE_FI',
+            activeFlag: 'Y',
+            startDate: '2026-01-01',
+            endDate: '2026-12-31',
+            service: 'Core',
+            dpServiceDescription: 'Core DP Service',
+          },
+          {
+            clientId: '1002',
+            core: 'Yes',
+            lite: 'Yes',
+            liteAndBlocking: 'Yes',
+            protectBuy: 'No',
+            hotlistService: 'Disabled',
+            dpServiceCode: 'DP-07',
+            validationStatus: 'Pending',
+            portfolioName: 'Beta',
+            lastupdatedBy: 'Jane Johnson',
+            lastUpdatedOn: '2026-02-05 02:40 PM',
+            searchDate: '2026-02-16',
+            hotListName: 'TGHL_LITE_FI',
+            activeFlag: 'N',
+            startDate: '2026-01-15',
+            endDate: '2026-06-30',
+            service: 'Lite',
+            dpServiceDescription: 'Lite DP Service',
+          },
+          {
+            clientId: '1003',
+            core: 'No',
+            lite: 'Yes',
+            liteAndBlocking: 'No',
+            protectBuy: 'Yes',
+            hotlistService: 'Enabled',
+            dpServiceCode: 'DP-12',
+            validationStatus: 'Valid',
+            portfolioName: 'Gamma',
+            lastupdatedBy: 'Michael Brown',
+            lastUpdatedOn: '2026-02-04 11:05 AM',
+            searchDate: '2026-02-16',
+            hotListName: 'THGL_PROTECTBUY_FI',
+            activeFlag: 'Y',
+            startDate: '2026-02-01',
+            endDate: '2026-10-31',
+            service: 'Protect Buy',
+            dpServiceDescription: 'Protect Buy DP Service',
+          },
+        ];
+
+        let data = rows;
+
+        if (clientId) {
+          data = data.filter((row) => row.clientId === String(clientId));
+        }
+
+        if (portfolioName) {
+          const lower = String(portfolioName).toLowerCase();
+          data = data.filter((row) => row.portfolioName.toLowerCase().includes(lower));
+        }
+
+        return {
+          code: '200',
+          message: 'Success',
+          responseList: data,
+          total: data.length,
+        };
+      });
+
       this.get('/reports/unique-user-logins', (_schema, request) => {
         const { page = '0', pageSize = '10' } = request.queryParams;
         const pageNum = parseInt(String(page));

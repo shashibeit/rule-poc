@@ -9,6 +9,7 @@ import ruleSchedulerReducer from '@/features/reports/ruleSchedulerSlice';
 import operationHistoryReducer from '@/features/reports/operationHistorySlice';
 import uniqueUserLoginReducer from '@/features/reports/uniqueUserLoginSlice';
 import ruleCountReducer from '@/features/reports/ruleCountSlice';
+import fiHotlistCheckReducer from '@/features/reports/fiHotlistCheckSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -21,4 +22,5 @@ export const rootReducer = combineReducers({
   operationHistory: operationHistoryReducer,
   uniqueUserLogin: uniqueUserLoginReducer,
   ruleCount: ruleCountReducer,
+  fiHotlistCheck: fiHotlistCheckReducer,
 });

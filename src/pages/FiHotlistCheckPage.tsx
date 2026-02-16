@@ -13,21 +13,13 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
-
-interface HotlistRecord {
-  id: string;
-  clientId: string;
-  core: string;
-  lite: string;
-  liteBlocking: string;
-  protectBuy: string;
-  hotlistService: string;
-  opServiceCode: string;
-  validationStatus: string;
-  portfolioName: string;
-  hotlistLastUpdatedBy: string;
-  hotlistLastUpdatedOn: string;
-}
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import {
+  fetchFiHotlistAll,
+  fetchFiHotlistSearch,
+  HotlistRecord,
+  setFiHotlistRecords,
+} from '@/features/reports/fiHotlistCheckSlice';
 
 const MOCK_ROWS: HotlistRecord[] = [
   {
@@ -75,13 +67,15 @@ const MOCK_ROWS: HotlistRecord[] = [
 ];
 
 export const FiHotlistCheckPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { records, loading, error } = useAppSelector((state) => state.fiHotlistCheck);
   const [mode, setMode] = useState<'single' | 'multiple' | 'date'>('single');
   const [clientId, setClientId] = useState('');
   const [portfolioName, setPortfolioName] = useState('');
   const [fileName, setFileName] = useState('');
   const [date, setDate] = useState<Dayjs | null>(null);
   const [errors, setErrors] = useState<{ clientId?: string; portfolioName?: string; date?: string; file?: string }>({});
-  const [rows, setRows] = useState<HotlistRecord[]>([]);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   const columns = useMemo<GridColDef<HotlistRecord>[]>(
     () => [
@@ -117,12 +111,17 @@ export const FiHotlistCheckPage: FC = () => {
       return;
     }
 
-    setRows(MOCK_ROWS);
+    dispatch(
+      fetchFiHotlistSearch({
+        clientId: hasClientId ? clientId.trim() : '',
+        portfolioName: hasPortfolio ? portfolioName.trim() : '',
+      })
+    );
   };
 
   const handleSearchAll = () => {
     resetErrors();
-    setRows(MOCK_ROWS);
+    dispatch(fetchFiHotlistAll());
   };
 
   const handleSearchMultiple = () => {
@@ -134,7 +133,7 @@ export const FiHotlistCheckPage: FC = () => {
     if (Object.keys(nextErrors).length > 0) {
       return;
     }
-    setRows(MOCK_ROWS);
+    dispatch(setFiHotlistRecords(MOCK_ROWS));
   };
 
   const handleSearchByDate = () => {
@@ -155,7 +154,14 @@ export const FiHotlistCheckPage: FC = () => {
     if (Object.keys(nextErrors).length > 0) {
       return;
     }
-    setRows(MOCK_ROWS);
+    const formattedDate = date ? date.format('D-MMM-YYYY').toUpperCase() : '';
+    dispatch(
+      fetchFiHotlistSearch({
+        clientId: hasClientId ? clientId.trim() : '',
+        portfolioName: hasPortfolio ? portfolioName.trim() : '',
+        searchDate: formattedDate,
+      })
+    );
   };
 
   return (
@@ -313,18 +319,23 @@ export const FiHotlistCheckPage: FC = () => {
         </LocalizationProvider>
       )}
 
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <Box sx={{ mt: 3 }}>
         <DataGrid
           autoHeight
-          rows={rows}
+          rows={records}
           columns={columns}
+          loading={loading}
           disableRowSelectionOnClick
+          paginationMode="client"
           pageSizeOptions={[5, 10, 25, 50]}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
           sx={{
             border: 'none',
             '& .MuiDataGrid-columnHeaders': {
