@@ -586,6 +586,42 @@ export function makeServer() {
         };
       });
 
+      this.get('/rules/v1/getFiCompareResult', () => {
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
+          responseList: [
+            {
+              clientId: '1001',
+              serviceCode: 'DP-01',
+              fiName: 'Alpha FI',
+              onFiDetails: 'Present',
+              onOrgClientDetails: 'Present',
+              status: 'MATCHED',
+              details: 'FI details and org client details are in sync',
+            },
+            {
+              clientId: '1002',
+              serviceCode: 'DP-07',
+              fiName: 'Beta FI',
+              onFiDetails: 'Present',
+              onOrgClientDetails: 'Missing',
+              status: 'MISMATCH',
+              details: 'Org client details missing for service mapping',
+            },
+            {
+              clientId: '1003',
+              serviceCode: 'DP-12',
+              fiName: 'Gamma FI',
+              onFiDetails: 'Present',
+              onOrgClientDetails: 'Present',
+              status: 'MATCHED',
+              details: 'No differences found',
+            },
+          ],
+        };
+      });
+
       this.post('/rules/v1/updateFiDetails', (_schema, request) => {
         const body = JSON.parse(request.requestBody || '{}');
         const { clientID } = body;

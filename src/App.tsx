@@ -32,6 +32,7 @@ import { RolesAssignedToUserGroupPage } from './pages/RolesAssignedToUserGroupPa
 import { RolesAssignedToSubTenantUsersPage } from './pages/RolesAssignedToSubTenantUsersPage';
 import { AddFiPage } from './pages/AddFiPage';
 import { SearchModifyFiPage } from './pages/SearchModifyFiPage';
+import { FiBoardingStatusPage } from './pages/FiBoardingStatusPage';
 
 const getInitialMode = (): PaletteMode => {
   const stored = window.localStorage.getItem('color-mode');
@@ -260,7 +261,7 @@ function App() {
               path="portfolio-management/fi-boarding-status"
               element={
                 <RoleGuard allowedRoles={['Rule_Reviewer']}>
-                  <PageSkeleton title="FI Boarding Status" />
+                  <FiBoardingStatusPage />
                 </RoleGuard>
               }
             />

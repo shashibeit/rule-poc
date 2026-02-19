@@ -15,6 +15,7 @@ import searchCgUsingPanReducer from '@/features/reports/searchCgUsingPanSlice';
 import hotlistAuditHistoryReducer from '@/features/reports/hotlistAuditHistorySlice';
 import addFiReducer from '@/features/reports/addFiSlice';
 import searchModifyFiReducer from '@/features/reports/searchModifyFiSlice';
+import fiBoardingStatusReducer from '@/features/reports/fiBoardingStatusSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -33,4 +34,5 @@ export const rootReducer = combineReducers({
   hotlistAuditHistory: hotlistAuditHistoryReducer,
   addFi: addFiReducer,
   searchModifyFi: searchModifyFiReducer,
+  fiBoardingStatus: fiBoardingStatusReducer,
 });
