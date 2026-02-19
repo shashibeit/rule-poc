@@ -4,6 +4,9 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { clearAddFiMessage, submitAddFiDetails } from '@/features/reports/addFiSlice';
 
 const DEBIT_PROTECT_SERVICE_OPTIONS = [
+  'LITE',
+  'ALERTING',
+  'DPAB',
   'Custom Alerting',
   'Guardian',
   'No Rules',
@@ -11,7 +14,7 @@ const DEBIT_PROTECT_SERVICE_OPTIONS = [
   'Profile MATURATION',
 ];
 
-const CARD_HOLDER_SERVICES_OPTIONS = ['Disalbed', 'Enabled'];
+const CARD_HOLDER_SERVICES_OPTIONS = ['Disabled', 'Enabled'];
 const DIRECT_PROTECT_COMMUNICATE_OPTIONS = ['Disabled', 'Enabled'];
 const DIRECT_PROTECT_COMPROMISE_MANAGER_OPTIONS = ['Disabled', 'Enabled'];
 const DEBIT_PROTECT_COMPROMISE_SERVICE_OPTIONS = ['Managed', 'Dedicated'];
@@ -27,6 +30,17 @@ const strPatternFiName = /[^a-zA-Z0-9\s&\-•.]/g;
 const DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP: Record<string, string> = {
   Managed: 'M',
   Dedicated: 'D',
+};
+
+const DEBIT_PROTECT_SERVICE_FLAG_MAP: Record<string, string> = {
+  LITE: 'L',
+  ALERTING: 'A',
+  DPAB: 'D',
+  'Custom Alerting': 'C',
+  Guardian: 'G',
+  'No Rules': 'X',
+  'Not Enabled': 'N',
+  'Profile MATURATION': 'P',
 };
 
 const getUniqueInvalidChars = (value: string, invalidPattern: RegExp) =>
@@ -257,6 +271,7 @@ export const AddFiPage: FC = () => {
         ? DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP[debitProtectCompromiseService]
         : undefined;
     const ccmTenantId = directProtectCompromiseManager === 'Enabled' ? dcmTenantId.trim() : undefined;
+    const dpsComments = serviceComments.trim();
 
     const payload = {
       ACRO: acro.trim(),
@@ -265,9 +280,9 @@ export const AddFiPage: FC = () => {
       ...(ccmTenantId ? { CCM_TENANT_ID: ccmTenantId } : {}),
       CCS_FLAG: toEnabledDisabledFlag(cardHolderServices),
       CHS_FLAG: toEnabledDisabledFlag(directProtectCommunicate),
-      ClientID: Number(clientId.trim()),
-      DPS_COMMENTS: serviceComments.trim(),
-      DPS_FLAG: 'N',
+      ClientID: clientId.trim(),
+      ...(dpsComments ? { DPS_COMMENTS: dpsComments } : {}),
+      DPS_FLAG: DEBIT_PROTECT_SERVICE_FLAG_MAP[debitProtectService] ?? '',
       'FI Name': salesforceFiName.trim(),
       'Portfolio Name': portfolioName.trim(),
       stopPayFlag: toEnabledDisabledFlag(stopPay),

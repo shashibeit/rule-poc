@@ -8,8 +8,8 @@ export interface AddFiRequestPayload {
   CCM_TENANT_ID?: string;
   CCS_FLAG: string;
   CHS_FLAG: string;
-  ClientID: number;
-  DPS_COMMENTS: string;
+  ClientID: string;
+  DPS_COMMENTS?: string;
   DPS_FLAG: string;
   'FI Name': string;
   'Portfolio Name': string;
