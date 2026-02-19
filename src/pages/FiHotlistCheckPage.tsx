@@ -52,8 +52,10 @@ export const FiHotlistCheckPage: FC = () => {
 
   const handleSearchSingle = () => {
     const nextErrors: typeof errors = {};
-    const hasClientId = clientId.trim().length > 0;
-    const hasPortfolio = portfolioName.trim().length > 0;
+    const trimmedClientId = clientId.trim();
+    const trimmedPortfolioName = portfolioName.trim();
+    const hasClientId = trimmedClientId.length > 0;
+    const hasPortfolio = trimmedPortfolioName.length > 0;
 
     if (!hasClientId && !hasPortfolio) {
       nextErrors.clientId = 'Client ID or Portfolio Name is required';
@@ -67,8 +69,8 @@ export const FiHotlistCheckPage: FC = () => {
 
     dispatch(
       fetchFiHotlistSearch({
-        clientId: hasClientId ? clientId.trim() : '',
-        portfolioName: hasPortfolio ? portfolioName.trim() : '',
+        ...(hasClientId ? { clientId: trimmedClientId } : {}),
+        ...(!hasClientId && hasPortfolio ? { portfolioName: trimmedPortfolioName } : {}),
       })
     );
   };
@@ -92,8 +94,10 @@ export const FiHotlistCheckPage: FC = () => {
 
   const handleSearchByDate = () => {
     const nextErrors: typeof errors = {};
-    const hasClientId = clientId.trim().length > 0;
-    const hasPortfolio = portfolioName.trim().length > 0;
+    const trimmedClientId = clientId.trim();
+    const trimmedPortfolioName = portfolioName.trim();
+    const hasClientId = trimmedClientId.length > 0;
+    const hasPortfolio = trimmedPortfolioName.length > 0;
 
     if (!hasClientId && !hasPortfolio) {
       nextErrors.clientId = 'Client ID or Portfolio Name is required';
@@ -111,8 +115,8 @@ export const FiHotlistCheckPage: FC = () => {
     const formattedDate = date ? date.format('D-MMM-YYYY').toUpperCase() : '';
     dispatch(
       fetchFiHotlistSearch({
-        clientId: hasClientId ? clientId.trim() : '',
-        portfolioName: hasPortfolio ? portfolioName.trim() : '',
+        ...(hasClientId ? { clientId: trimmedClientId } : {}),
+        ...(!hasClientId && hasPortfolio ? { portfolioName: trimmedPortfolioName } : {}),
         searchDate: formattedDate,
       })
     );

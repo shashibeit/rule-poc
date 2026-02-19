@@ -28,6 +28,7 @@ export interface DataGridViewProps {
   searchText?: string;
   onSearchChange?: (searchText: string) => void;
   searchFields?: string[];
+  onRowClick?: (row: any) => void;
 }
 
 export const withDataGrid = <P extends object>(
@@ -53,6 +54,7 @@ export const withDataGrid = <P extends object>(
       searchText = '',
       onSearchChange,
       searchFields = [],
+      onRowClick,
       ...rest
     } = props;
 
@@ -221,6 +223,7 @@ export const withDataGrid = <P extends object>(
               onPaginationModelChange={handlePaginationModelChange}
               getRowId={enhancedGetRowId}
               disableRowSelectionOnClick
+              onRowClick={(params) => onRowClick?.(params.row)}
               slots={slots}
               sx={{
                 border: 'none',

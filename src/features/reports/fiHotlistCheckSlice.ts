@@ -58,7 +58,7 @@ const normalizeHotlistRecords = (data?: HotlistRecordInput[]) =>
 
 export const fetchFiHotlistSearch = createAsyncThunk(
   'reports/fetchFiHotlistSearch',
-  async (params: { clientId: string; portfolioName: string; searchDate?: string }) => {
+  async (params: { clientId?: string; portfolioName?: string; searchDate?: string }) => {
     const response = await apiClient.post<{
       responseList?: HotlistRecordInput[];
       response?: HotlistRecordInput[];

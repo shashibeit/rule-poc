@@ -586,6 +586,115 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/updateFiDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { clientID } = body;
+
+        if (!clientID) {
+          return {
+            code: 'FI_DETAIL_VALIDATION_ERROR',
+            message: 'clientID is required',
+            responseList: [],
+          };
+        }
+
+        return {
+          code: '200',
+          message: 'FI details updated successfully',
+          responseList: [body],
+        };
+      });
+
+      this.post('/rules/v1/searchFiDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { clientId = '', clientID = '', fiShortName = '' } = body;
+        const requestedClientId = String(clientID || clientId || '').trim();
+        const requestedShortName = String(fiShortName || '').trim().toLowerCase();
+
+        const rows = [
+          {
+            clientId: '1001',
+            portfolioName: 'Alpha',
+            acro: 'ALP',
+            fiName: 'Alpha FI',
+            falcom: 'E',
+            advice: 'Existing comments',
+            dpsFlag: 'C',
+            dpsComments: 'Existing comments',
+            dpsLastUpdatedDate: '2026-02-06 10:15 AM',
+            dpsLastUpdatedUid: 'john.smith',
+            chsFlag: 'E',
+            chsLastUpdatedDate: '2026-02-06 10:20 AM',
+            chsLastUpdatedUid: 'john.smith',
+            cssFlag: 'E',
+            ccsFlag: 'E',
+            ccsLastUpdatedUid: 'john.smith',
+            ccmFlag: 'E',
+            ccmServiceFlag: 'M',
+            ccmTenantId: '14314',
+            ccmLastUpdatedDate: '2026-02-06 10:25 AM',
+          },
+          {
+            clientId: '1002',
+            portfolioName: 'Beta',
+            acro: 'BET',
+            fiName: 'Beta FI',
+            falcom: 'D',
+            advice: '',
+            dpsFlag: 'X',
+            dpsComments: '',
+            dpsLastUpdatedDate: '2026-02-05 02:40 PM',
+            dpsLastUpdatedUid: 'jane.johnson',
+            chsFlag: 'D',
+            chsLastUpdatedDate: '2026-02-05 02:45 PM',
+            chsLastUpdatedUid: 'jane.johnson',
+            cssFlag: 'D',
+            ccsFlag: 'D',
+            ccsLastUpdatedUid: 'jane.johnson',
+            ccmFlag: 'D',
+            ccmServiceFlag: '',
+            ccmTenantId: '',
+            ccmLastUpdatedDate: '2026-02-05 02:50 PM',
+          },
+          {
+            clientId: '1003',
+            portfolioName: 'Gamma',
+            acro: 'GAM',
+            fiName: 'Gamma FI',
+            falcom: 'E',
+            advice: 'Review required',
+            dpsFlag: 'G',
+            dpsComments: 'Review required',
+            dpsLastUpdatedDate: '2026-02-04 11:05 AM',
+            dpsLastUpdatedUid: 'michael.brown',
+            chsFlag: 'D',
+            chsLastUpdatedDate: '2026-02-04 11:10 AM',
+            chsLastUpdatedUid: 'michael.brown',
+            cssFlag: 'E',
+            ccsFlag: 'E',
+            ccsLastUpdatedUid: 'michael.brown',
+            ccmFlag: 'E',
+            ccmServiceFlag: 'D',
+            ccmTenantId: '99999',
+            ccmLastUpdatedDate: '2026-02-04 11:15 AM',
+          },
+        ];
+
+        let filtered = rows;
+        if (requestedClientId) {
+          filtered = filtered.filter((row) => row.clientId === requestedClientId);
+        }
+        if (requestedShortName) {
+          filtered = filtered.filter((row) => row.fiName.toLowerCase().includes(requestedShortName));
+        }
+
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
+          responseList: filtered,
+        };
+      });
+
       this.post('/rules/v1/getCompromiseIdDetails', (_schema, request) => {
         const body = JSON.parse(request.requestBody || '{}');
         const { compromiseIncidentId = '' } = body;
