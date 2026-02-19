@@ -4,8 +4,8 @@ import { apiClient } from '@/api/client';
 export interface AddFiRequestPayload {
   ACRO: string;
   CCM_FLAG: string;
-  CCM_SERVICE_FLAG: string;
-  'CCM TENANT_ID': string;
+  CCM_SERVICE_FLAG?: string;
+  CCM_TENANT_ID?: string;
   CCS_FLAG: string;
   CHS_FLAG: string;
   ClientID: number;

@@ -252,14 +252,17 @@ export const AddFiPage: FC = () => {
       return;
     }
 
+    const ccmServiceFlag =
+      directProtectCompromiseManager === 'Enabled'
+        ? DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP[debitProtectCompromiseService]
+        : undefined;
+    const ccmTenantId = directProtectCompromiseManager === 'Enabled' ? dcmTenantId.trim() : undefined;
+
     const payload = {
       ACRO: acro.trim(),
       CCM_FLAG: toEnabledDisabledFlag(directProtectCompromiseManager),
-      CCM_SERVICE_FLAG:
-        directProtectCompromiseManager === 'Enabled'
-          ? DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP[debitProtectCompromiseService] ?? ''
-          : '',
-      'CCM TENANT_ID': directProtectCompromiseManager === 'Enabled' ? dcmTenantId.trim() : '',
+      ...(ccmServiceFlag ? { CCM_SERVICE_FLAG: ccmServiceFlag } : {}),
+      ...(ccmTenantId ? { CCM_TENANT_ID: ccmTenantId } : {}),
       CCS_FLAG: toEnabledDisabledFlag(cardHolderServices),
       CHS_FLAG: toEnabledDisabledFlag(directProtectCommunicate),
       ClientID: Number(clientId.trim()),
@@ -272,11 +275,11 @@ export const AddFiPage: FC = () => {
 
     const result = await dispatch(submitAddFiDetails(payload));
     if (submitAddFiDetails.fulfilled.match(result)) {
-      handleClear();
+      handleClear(false);
     }
   };
 
-  const handleClear = () => {
+  const handleClear = (clearMessage = true) => {
     setClientId('');
     setPortfolioName('');
     setAcro('');
@@ -291,7 +294,9 @@ export const AddFiPage: FC = () => {
     setServiceComments('');
     setErrors({});
     setTouched({});
-    dispatch(clearAddFiMessage());
+    if (clearMessage) {
+      dispatch(clearAddFiMessage());
+    }
   };
 
   return (
@@ -575,7 +580,7 @@ export const AddFiPage: FC = () => {
             <Button variant="contained" onClick={handleSubmit} disabled={loading}>
               {loading ? <CircularProgress size={18} color="inherit" /> : 'Submit'}
             </Button>
-            <Button variant="outlined" onClick={handleClear} disabled={loading}>
+            <Button variant="outlined" onClick={() => handleClear()} disabled={loading}>
               Clear
             </Button>
           </Box>
