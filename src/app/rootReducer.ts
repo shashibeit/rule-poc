@@ -13,6 +13,7 @@ import fiHotlistCheckReducer from '@/features/reports/fiHotlistCheckSlice';
 import getCgCountPansReducer from '@/features/reports/getCgCountPansSlice';
 import searchCgUsingPanReducer from '@/features/reports/searchCgUsingPanSlice';
 import hotlistAuditHistoryReducer from '@/features/reports/hotlistAuditHistorySlice';
+import addFiReducer from '@/features/reports/addFiSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -29,4 +30,5 @@ export const rootReducer = combineReducers({
   getCgCountPans: getCgCountPansReducer,
   searchCgUsingPan: searchCgUsingPanReducer,
   hotlistAuditHistory: hotlistAuditHistoryReducer,
+  addFi: addFiReducer,
 });

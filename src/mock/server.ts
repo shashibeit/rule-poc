@@ -1033,6 +1033,32 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/addFiDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+
+        if (!body.ClientID || !body.ACRO || !body['FI Name'] || !body['Portfolio Name']) {
+          return {
+            code: 'FI_DETAIL_VALIDATION_ERROR',
+            message: 'Required fields are missing',
+            responseList: [],
+          };
+        }
+
+        if (String(body.ClientID) === '123412345') {
+          return {
+            code: 'FI_DETAIL_DATA_BASE_ERROR',
+            message: 'Database error occured while fetching data',
+            responseList: [],
+          };
+        }
+
+        return {
+          code: '200',
+          message: 'FI details added successfully',
+          responseList: [body],
+        };
+      });
+
       this.get('/reports/rule-history', (_schema, request) => {
         const {
           page = '0',

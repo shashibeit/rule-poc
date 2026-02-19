@@ -1,5 +1,7 @@
-import { FC, useState } from 'react';
-import { Box, Button, MenuItem, TextField, Typography, Grid } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { Alert, Box, Button, CircularProgress, MenuItem, TextField, Typography, Grid } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { clearAddFiMessage, submitAddFiDetails } from '@/features/reports/addFiSlice';
 
 const DEBIT_PROTECT_SERVICE_OPTIONS = [
   'Custom Alerting',
@@ -12,7 +14,52 @@ const DEBIT_PROTECT_SERVICE_OPTIONS = [
 const CARD_HOLDER_SERVICES_OPTIONS = ['Disalbed', 'Enabled'];
 const DIRECT_PROTECT_COMMUNICATE_OPTIONS = ['Disabled', 'Enabled'];
 const DIRECT_PROTECT_COMPROMISE_MANAGER_OPTIONS = ['Disabled', 'Enabled'];
+const DEBIT_PROTECT_COMPROMISE_SERVICE_OPTIONS = ['Managed', 'Dedicated'];
 const STOP_PAY_OPTIONS = ['Enabled', 'Disabled'];
+
+const patternClientId = /^[0-9]+$/;
+const patternAcro = /^[a-zA-Z0-9]+$/;
+const patternFiName = /^[a-zA-Z0-9\s&\-•.]+$/;
+const strPatternClientId = /[^0-9]/g;
+const strPatternAcro = /[^a-zA-Z0-9]/g;
+const strPatternFiName = /[^a-zA-Z0-9\s&\-•.]/g;
+
+const DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP: Record<string, string> = {
+  Managed: 'M',
+  Dedicated: 'D',
+};
+
+const getUniqueInvalidChars = (value: string, invalidPattern: RegExp) =>
+  Array.from(new Set(value.match(invalidPattern) ?? [])).join('');
+
+const toEnabledDisabledFlag = (value: string) => (value.toLowerCase().startsWith('en') ? 'E' : 'D');
+
+type FieldName =
+  | 'clientId'
+  | 'portfolioName'
+  | 'acro'
+  | 'salesforceFiName'
+  | 'debitProtectService'
+  | 'cardHolderServices'
+  | 'directProtectCommunicate'
+  | 'directProtectCompromiseManager'
+  | 'dcmTenantId'
+  | 'debitProtectCompromiseService'
+  | 'stopPay';
+
+interface AddFiFormValues {
+  clientId: string;
+  portfolioName: string;
+  acro: string;
+  salesforceFiName: string;
+  debitProtectService: string;
+  cardHolderServices: string;
+  directProtectCommunicate: string;
+  directProtectCompromiseManager: string;
+  dcmTenantId: string;
+  debitProtectCompromiseService: string;
+  stopPay: string;
+}
 
 export const AddFiPage: FC = () => {
   const [clientId, setClientId] = useState('');
@@ -23,31 +70,209 @@ export const AddFiPage: FC = () => {
   const [cardHolderServices, setCardHolderServices] = useState('');
   const [directProtectCommunicate, setDirectProtectCommunicate] = useState('');
   const [directProtectCompromiseManager, setDirectProtectCompromiseManager] = useState('');
+  const [dcmTenantId, setDcmTenantId] = useState('');
+  const [debitProtectCompromiseService, setDebitProtectCompromiseService] = useState('');
   const [stopPay, setStopPay] = useState('');
   const [serviceComments, setServiceComments] = useState('');
 
+  const dispatch = useAppDispatch();
+  const { loading, error, successMessage } = useAppSelector((state) => state.addFi);
+  const apiMessage = successMessage
+    ? { severity: 'success' as const, text: successMessage }
+    : error
+      ? { severity: 'error' as const, text: error }
+      : null;
+
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
+
+  useEffect(() => {
+    if (!apiMessage) return;
+
+    const timeoutId = window.setTimeout(() => {
+      dispatch(clearAddFiMessage());
+    }, 5000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [apiMessage, dispatch]);
+
+  const getValues = (overrides: Partial<AddFiFormValues> = {}): AddFiFormValues => ({
+    clientId,
+    portfolioName,
+    acro,
+    salesforceFiName,
+    debitProtectService,
+    cardHolderServices,
+    directProtectCommunicate,
+    directProtectCompromiseManager,
+    dcmTenantId,
+    debitProtectCompromiseService,
+    stopPay,
+    ...overrides,
+  });
+
+  const getFieldError = (field: FieldName, values: AddFiFormValues): string | undefined => {
+    if (field === 'clientId') {
+      if (!values.clientId.trim()) return 'Client ID is required';
+      if (!patternClientId.test(values.clientId.trim())) {
+        const invalidChars = getUniqueInvalidChars(values.clientId, strPatternClientId);
+        return invalidChars
+          ? `Client ID allows only digits. Invalid character(s): ${invalidChars}`
+          : 'Client ID allows only digits';
+      }
+      return undefined;
+    }
+
+    if (field === 'portfolioName') {
+      if (!values.portfolioName.trim()) return 'Portfolio Name is required';
+      if (!patternFiName.test(values.portfolioName.trim())) {
+        const invalidChars = getUniqueInvalidChars(values.portfolioName, strPatternFiName);
+        return invalidChars
+          ? `Portfolio Name has invalid character(s): ${invalidChars}`
+          : 'Portfolio Name has invalid characters';
+      }
+      return undefined;
+    }
+
+    if (field === 'acro') {
+      if (!values.acro.trim()) return 'ACRO is required';
+      if (!patternAcro.test(values.acro.trim())) {
+        const invalidChars = getUniqueInvalidChars(values.acro, strPatternAcro);
+        return invalidChars
+          ? `ACRO allows only letters and numbers. Invalid character(s): ${invalidChars}`
+          : 'ACRO allows only letters and numbers';
+      }
+      return undefined;
+    }
+
+    if (field === 'salesforceFiName') {
+      if (!values.salesforceFiName.trim()) return 'Salesforce FI Name is required';
+      if (!patternFiName.test(values.salesforceFiName.trim())) {
+        const invalidChars = getUniqueInvalidChars(values.salesforceFiName, strPatternFiName);
+        return invalidChars
+          ? `FI Name has invalid character(s): ${invalidChars}`
+          : 'FI Name has invalid characters';
+      }
+      return undefined;
+    }
+
+    if (field === 'debitProtectService' && !values.debitProtectService) return 'Debit Protect Service is required';
+    if (field === 'cardHolderServices' && !values.cardHolderServices) return 'Card Holder Services is required';
+    if (field === 'directProtectCommunicate' && !values.directProtectCommunicate) return 'DebitProtect Communicate is required';
+    if (field === 'directProtectCompromiseManager' && !values.directProtectCompromiseManager) return 'DebitProtect Compromise Manager is required';
+
+    if (field === 'dcmTenantId' && values.directProtectCompromiseManager === 'Enabled') {
+      if (!values.dcmTenantId.trim()) return 'DCM Tenant ID is required when Manager is Enabled';
+      if (values.dcmTenantId.trim().length > 5) return 'DCM Tenant ID must be maximum 5 characters';
+    }
+
+    if (
+      field === 'debitProtectCompromiseService' &&
+      values.directProtectCompromiseManager === 'Enabled' &&
+      !values.debitProtectCompromiseService
+    ) {
+      return 'DebitProtect Compromise Service is required when Manager is Enabled';
+    }
+
+    if (field === 'stopPay' && !values.stopPay) return 'Stop Pay is required';
+
+    return undefined;
+  };
+
+  const setFieldError = (field: FieldName, error?: string) => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (error) {
+        next[field] = error;
+      } else {
+        delete next[field];
+      }
+      return next;
+    });
+  };
+
+  const validateTouchedField = (field: FieldName, overrides: Partial<AddFiFormValues> = {}) => {
+    if (!touched[field] && !errors[field]) return;
+    const values = getValues(overrides);
+    setFieldError(field, getFieldError(field, values));
+  };
+
+  const markTouchedAndValidate = (field: FieldName, overrides: Partial<AddFiFormValues> = {}) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const values = getValues(overrides);
+    setFieldError(field, getFieldError(field, values));
+  };
 
   const validate = () => {
-    const nextErrors: {[key: string]: string} = {};
+    const values = getValues();
+    const fields: FieldName[] = [
+      'clientId',
+      'portfolioName',
+      'acro',
+      'salesforceFiName',
+      'debitProtectService',
+      'cardHolderServices',
+      'directProtectCommunicate',
+      'directProtectCompromiseManager',
+      'dcmTenantId',
+      'debitProtectCompromiseService',
+      'stopPay',
+    ];
 
-    if (!clientId.trim()) nextErrors.clientId = 'Client ID is required';
-    if (!portfolioName.trim()) nextErrors.portfolioName = 'Portfolio Name is required';
-    if (!acro.trim()) nextErrors.acro = 'ACRO is required';
-    if (!salesforceFiName.trim()) nextErrors.salesforceFiName = 'Salesforce FI Name is required';
-    if (!debitProtectService) nextErrors.debitProtectService = 'Debit Protect Service is required';
-    if (!cardHolderServices) nextErrors.cardHolderServices = 'Card Holder Services is required';
-    if (!directProtectCommunicate) nextErrors.directProtectCommunicate = 'DirectProtect Communicate is required';
-    if (!directProtectCompromiseManager) nextErrors.directProtectCompromiseManager = 'DirectProtect Compromise Manager is required';
-    if (!stopPay) nextErrors.stopPay = 'Stop Pay is required';
+    const nextErrors: {[key: string]: string} = {};
+    fields.forEach((field) => {
+      const fieldError = getFieldError(field, values);
+      if (fieldError) {
+        nextErrors[field] = fieldError;
+      }
+    });
+
+    setTouched({
+      clientId: true,
+      portfolioName: true,
+      acro: true,
+      salesforceFiName: true,
+      debitProtectService: true,
+      cardHolderServices: true,
+      directProtectCommunicate: true,
+      directProtectCompromiseManager: true,
+      dcmTenantId: true,
+      debitProtectCompromiseService: true,
+      stopPay: true,
+    });
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    dispatch(clearAddFiMessage());
+
     if (!validate()) {
       return;
+    }
+
+    const payload = {
+      ACRO: acro.trim(),
+      CCM_FLAG: toEnabledDisabledFlag(directProtectCompromiseManager),
+      CCM_SERVICE_FLAG:
+        directProtectCompromiseManager === 'Enabled'
+          ? DEBIT_PROTECT_COMPROMISE_SERVICE_FLAG_MAP[debitProtectCompromiseService] ?? ''
+          : '',
+      'CCM TENANT_ID': directProtectCompromiseManager === 'Enabled' ? dcmTenantId.trim() : '',
+      CCS_FLAG: toEnabledDisabledFlag(cardHolderServices),
+      CHS_FLAG: toEnabledDisabledFlag(directProtectCommunicate),
+      ClientID: Number(clientId.trim()),
+      DPS_COMMENTS: serviceComments.trim(),
+      DPS_FLAG: 'N',
+      'FI Name': salesforceFiName.trim(),
+      'Portfolio Name': portfolioName.trim(),
+      stopPayFlag: toEnabledDisabledFlag(stopPay),
+    };
+
+    const result = await dispatch(submitAddFiDetails(payload));
+    if (submitAddFiDetails.fulfilled.match(result)) {
+      handleClear();
     }
   };
 
@@ -60,9 +285,13 @@ export const AddFiPage: FC = () => {
     setCardHolderServices('');
     setDirectProtectCommunicate('');
     setDirectProtectCompromiseManager('');
+    setDcmTenantId('');
+    setDebitProtectCompromiseService('');
     setStopPay('');
     setServiceComments('');
     setErrors({});
+    setTouched({});
+    dispatch(clearAddFiMessage());
   };
 
   return (
@@ -71,6 +300,12 @@ export const AddFiPage: FC = () => {
         Add FI
       </Typography>
 
+      {apiMessage && (
+        <Box sx={{ mb: 2 }}>
+          <Alert severity={apiMessage.severity}>{apiMessage.text}</Alert>
+        </Box>
+      )}
+
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <TextField
@@ -78,7 +313,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Client ID *"
             value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setClientId(nextValue);
+              validateTouchedField('clientId', { clientId: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('clientId')}
             error={!!errors.clientId}
             helperText={errors.clientId}
           />
@@ -89,7 +329,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Portfolio Name *"
             value={portfolioName}
-            onChange={(e) => setPortfolioName(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setPortfolioName(nextValue);
+              validateTouchedField('portfolioName', { portfolioName: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('portfolioName')}
             error={!!errors.portfolioName}
             helperText={errors.portfolioName}
           />
@@ -100,7 +345,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="ACRO *"
             value={acro}
-            onChange={(e) => setAcro(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setAcro(nextValue);
+              validateTouchedField('acro', { acro: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('acro')}
             error={!!errors.acro}
             helperText={errors.acro}
           />
@@ -111,7 +361,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Salesforce FI Name *"
             value={salesforceFiName}
-            onChange={(e) => setSalesforceFiName(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setSalesforceFiName(nextValue);
+              validateTouchedField('salesforceFiName', { salesforceFiName: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('salesforceFiName')}
             error={!!errors.salesforceFiName}
             helperText={errors.salesforceFiName}
           />
@@ -123,7 +378,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Debit Protect Service *"
             value={debitProtectService}
-            onChange={(e) => setDebitProtectService(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setDebitProtectService(nextValue);
+              validateTouchedField('debitProtectService', { debitProtectService: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('debitProtectService')}
             error={!!errors.debitProtectService}
             helperText={errors.debitProtectService}
           >
@@ -141,7 +401,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Card Holder Services *"
             value={cardHolderServices}
-            onChange={(e) => setCardHolderServices(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setCardHolderServices(nextValue);
+              validateTouchedField('cardHolderServices', { cardHolderServices: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('cardHolderServices')}
             error={!!errors.cardHolderServices}
             helperText={errors.cardHolderServices}
           >
@@ -157,9 +422,14 @@ export const AddFiPage: FC = () => {
             select
             fullWidth
             size="small"
-            label="DirectProtect Communicate *"
+            label="DebitProtect Communicate *"
             value={directProtectCommunicate}
-            onChange={(e) => setDirectProtectCommunicate(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setDirectProtectCommunicate(nextValue);
+              validateTouchedField('directProtectCommunicate', { directProtectCommunicate: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('directProtectCommunicate')}
             error={!!errors.directProtectCommunicate}
             helperText={errors.directProtectCommunicate}
           >
@@ -175,9 +445,33 @@ export const AddFiPage: FC = () => {
             select
             fullWidth
             size="small"
-            label="DirectProtect Compromise Manager *"
+            label="DebitProtect Compromise Manager *"
             value={directProtectCompromiseManager}
-            onChange={(e) => setDirectProtectCompromiseManager(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setDirectProtectCompromiseManager(nextValue);
+
+              validateTouchedField('directProtectCompromiseManager', {
+                directProtectCompromiseManager: nextValue,
+              });
+
+              if (nextValue !== 'Enabled') {
+                setDcmTenantId('');
+                setDebitProtectCompromiseService('');
+                setErrors((prev) => {
+                  const next = { ...prev };
+                  delete next.dcmTenantId;
+                  delete next.debitProtectCompromiseService;
+                  return next;
+                });
+                setTouched((prev) => ({
+                  ...prev,
+                  dcmTenantId: false,
+                  debitProtectCompromiseService: false,
+                }));
+              }
+            }}
+            onBlur={() => markTouchedAndValidate('directProtectCompromiseManager')}
             error={!!errors.directProtectCompromiseManager}
             helperText={errors.directProtectCompromiseManager}
           >
@@ -188,6 +482,54 @@ export const AddFiPage: FC = () => {
             ))}
           </TextField>
         </Grid>
+        {directProtectCompromiseManager === 'Enabled' && (
+          <>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="DCM Tenant ID *"
+                value={dcmTenantId}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (next.length <= 5) {
+                    setDcmTenantId(next);
+                    validateTouchedField('dcmTenantId', { dcmTenantId: next });
+                  }
+                }}
+                onBlur={() => markTouchedAndValidate('dcmTenantId')}
+                error={!!errors.dcmTenantId}
+                helperText={errors.dcmTenantId}
+                slotProps={{ htmlInput: { maxLength: 5 } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <TextField
+                select
+                fullWidth
+                size="small"
+                label="DebitProtect Compromise Service *"
+                value={debitProtectCompromiseService}
+                onChange={(e) => {
+                  const nextValue = e.target.value;
+                  setDebitProtectCompromiseService(nextValue);
+                  validateTouchedField('debitProtectCompromiseService', {
+                    debitProtectCompromiseService: nextValue,
+                  });
+                }}
+                onBlur={() => markTouchedAndValidate('debitProtectCompromiseService')}
+                error={!!errors.debitProtectCompromiseService}
+                helperText={errors.debitProtectCompromiseService}
+              >
+                {DEBIT_PROTECT_COMPROMISE_SERVICE_OPTIONS.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </>
+        )}
         <Grid size={{ xs: 12, md: 4 }}>
           <TextField
             select
@@ -195,7 +537,12 @@ export const AddFiPage: FC = () => {
             size="small"
             label="Stop Pay *"
             value={stopPay}
-            onChange={(e) => setStopPay(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setStopPay(nextValue);
+              validateTouchedField('stopPay', { stopPay: nextValue });
+            }}
+            onBlur={() => markTouchedAndValidate('stopPay')}
             error={!!errors.stopPay}
             helperText={errors.stopPay}
           >
@@ -210,7 +557,7 @@ export const AddFiPage: FC = () => {
           <TextField
             fullWidth
             size="small"
-            label="DirectProtect Service Comments"
+            label="DebitProtect Service Comments"
             value={serviceComments}
             onChange={(e) => {
               const next = e.target.value;
@@ -225,10 +572,10 @@ export const AddFiPage: FC = () => {
         </Grid>
         <Grid size={12}>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="contained" onClick={handleSubmit}>
-              Submit
+            <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+              {loading ? <CircularProgress size={18} color="inherit" /> : 'Submit'}
             </Button>
-            <Button variant="outlined" onClick={handleClear}>
+            <Button variant="outlined" onClick={handleClear} disabled={loading}>
               Clear
             </Button>
           </Box>
