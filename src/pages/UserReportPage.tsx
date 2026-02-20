@@ -5,6 +5,8 @@ import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataG
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchUserReportAll, fetchUserReportSearch } from '@/features/reports/userReportSlice';
 import { UserReportRecord } from '@/types';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 /**
  * UserReportPage - Uses CLIENT-SIDE pagination with Redux slice data
@@ -30,6 +32,10 @@ interface UserReportHeaderProps {
   onSearch: () => void;
   onSearchAll: () => void;
   onClear: () => void;
+  onDownloadExcel: () => void;
+  onDownloadCSV: () => void;
+  isExporting: boolean;
+  hasData: boolean;
 }
 
 const UserReportHeader: FC<UserReportHeaderProps> = ({
@@ -42,12 +48,38 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
   onSearch,
   onSearchAll,
   onClear,
+  onDownloadExcel,
+  onDownloadCSV,
+  isExporting,
+  hasData,
 }) => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        User Report
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="h4">
+          User Report
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadExcel}
+            disabled={isExporting || !hasData}
+          >
+            Download Excel
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadCSV}
+            disabled={isExporting || !hasData}
+          >
+            Download CSV
+          </Button>
+        </Box>
+      </Box>
       
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {dataInfo}
@@ -259,6 +291,16 @@ export const UserReportPage: FC = () => {
     []
   );
 
+  // Excel export hook
+  const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
+    filteredData,
+    columns,
+    {
+      filename: 'user-report',
+      sheetName: 'User Report',
+    }
+  );
+
   const props: DataGridViewProps = {
     rows: filteredData,
     columns,
@@ -293,6 +335,10 @@ export const UserReportPage: FC = () => {
       onSearch={handleSearch}
       onSearchAll={handleSearchAll}
       onClear={handleClear}
+      onDownloadExcel={exportToExcel}
+      onDownloadCSV={exportToCSV}
+      isExporting={isExporting}
+      hasData={filteredData.length > 0}
     />
   );
 };
