@@ -34,6 +34,7 @@ import { AddFiPage } from './pages/AddFiPage';
 import { SearchModifyFiPage } from './pages/SearchModifyFiPage';
 import { FiBoardingStatusPage } from './pages/FiBoardingStatusPage';
 import { ModifyDcSubBrandPage } from './pages/ModifyDcSubBrandPage';
+import { FiBoardingPage } from './pages/FiBoardingPage';
 
 const getInitialMode = (): PaletteMode => {
   const stored = window.localStorage.getItem('color-mode');
@@ -254,7 +255,7 @@ function App() {
               path="portfolio-management/fi-boarding"
               element={
                 <RoleGuard allowedRoles={['Rule_Reviewer']}>
-                  <PageSkeleton title="FI Boarding" />
+                  <FiBoardingPage />
                 </RoleGuard>
               }
             />

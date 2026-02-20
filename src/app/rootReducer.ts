@@ -17,6 +17,7 @@ import addFiReducer from '@/features/reports/addFiSlice';
 import searchModifyFiReducer from '@/features/reports/searchModifyFiSlice';
 import fiBoardingStatusReducer from '@/features/reports/fiBoardingStatusSlice';
 import modifyDcSubBrandReducer from '@/features/reports/modifyDcSubBrandSlice';
+import fiBoardingReducer from '@/features/reports/fiBoardingSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -37,4 +38,5 @@ export const rootReducer = combineReducers({
   searchModifyFi: searchModifyFiReducer,
   fiBoardingStatus: fiBoardingStatusReducer,
   modifyDcSubBrand: modifyDcSubBrandReducer,
+  fiBoarding: fiBoardingReducer,
 });

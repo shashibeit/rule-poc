@@ -229,8 +229,8 @@ export const withDataGrid = <P extends object>(
               onRowClick={(params) => onRowClick?.(params.row)}
               {...dataGridProps}
               slots={slots}
-              sx={[
-                {
+              sx={
+                dataGridProps?.sx || {
                   border: 'none',
                   height: '100%',
                   width: '100%',
@@ -262,9 +262,8 @@ export const withDataGrid = <P extends object>(
                     width: 'max-content',
                     minWidth: '100%',
                   },
-                },
-                dataGridProps?.sx,
-              ]}
+                }
+              }
             />
           </Box>
         </Paper>

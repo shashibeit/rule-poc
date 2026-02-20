@@ -670,6 +670,55 @@ export function makeServer() {
         };
       });
 
+      this.get('/rules/v1/getNotBoardedFiDetails', () => {
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
+          responseList: [
+            {
+              clientId: '100000012',
+              portfolioName: '100000012Functionaltesting',
+              fiName: '100000012FunctionaltestingLongName',
+              dpsDescription: 'Lite',
+            },
+            {
+              clientId: '100000013',
+              portfolioName: '100000013Functionaltesting',
+              fiName: '100000013FunctionaltestingLongName',
+              dpsDescription: 'Alerting',
+            },
+          ],
+        };
+      });
+
+      this.post('/rules/v1/sendFIOnboardingEmail', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '[]');
+
+        if (!Array.isArray(body) || body.length === 0) {
+          return {
+            code: 'Email Error',
+            data: {
+              message: 'No FI rows selected for onboarding email',
+            },
+          };
+        }
+
+        const hasInvalid = body.some((row: any) => !row.clientId || !row.FiName || !row.portfolioName);
+        if (hasInvalid) {
+          return {
+            code: 'Email Error',
+            data: {
+              message: 'Mandatory FI onboarding fields are missing',
+            },
+          };
+        }
+
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
+        };
+      });
+
       this.post('/rules/v1/updateFiDetails', (_schema, request) => {
         const body = JSON.parse(request.requestBody || '{}');
         const { clientID } = body;
