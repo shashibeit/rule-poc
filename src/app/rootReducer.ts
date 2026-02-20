@@ -16,6 +16,7 @@ import hotlistAuditHistoryReducer from '@/features/reports/hotlistAuditHistorySl
 import addFiReducer from '@/features/reports/addFiSlice';
 import searchModifyFiReducer from '@/features/reports/searchModifyFiSlice';
 import fiBoardingStatusReducer from '@/features/reports/fiBoardingStatusSlice';
+import modifyDcSubBrandReducer from '@/features/reports/modifyDcSubBrandSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -35,4 +36,5 @@ export const rootReducer = combineReducers({
   addFi: addFiReducer,
   searchModifyFi: searchModifyFiReducer,
   fiBoardingStatus: fiBoardingStatusReducer,
+  modifyDcSubBrand: modifyDcSubBrandReducer,
 });

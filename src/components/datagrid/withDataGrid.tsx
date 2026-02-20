@@ -6,6 +6,7 @@ import {
   GridPaginationModel,
   GridFooterContainer,
   GridPagination,
+  DataGridProps,
 } from '@mui/x-data-grid';
 import { Box, Paper, TextField, Typography } from '@mui/material';
 import { generateRowId, clientSideSearch, ClientPaginationResult } from '@/utils/datagrid';
@@ -29,6 +30,7 @@ export interface DataGridViewProps {
   onSearchChange?: (searchText: string) => void;
   searchFields?: string[];
   onRowClick?: (row: any) => void;
+  dataGridProps?: Partial<DataGridProps>;
 }
 
 export const withDataGrid = <P extends object>(
@@ -55,6 +57,7 @@ export const withDataGrid = <P extends object>(
       onSearchChange,
       searchFields = [],
       onRowClick,
+      dataGridProps,
       ...rest
     } = props;
 
@@ -224,40 +227,44 @@ export const withDataGrid = <P extends object>(
               getRowId={enhancedGetRowId}
               disableRowSelectionOnClick
               onRowClick={(params) => onRowClick?.(params.row)}
+              {...dataGridProps}
               slots={slots}
-              sx={{
-                border: 'none',
-                height: '100%',
-                width: '100%',
-                maxWidth: '100%',
-                bgcolor: 'background.paper',
-                '& .MuiDataGrid-columnHeaders': {
-                  backgroundColor: (theme) => theme.palette.grey[300],
-                },
-                '& .MuiDataGrid-columnHeaderTitle': {
-                  fontWeight: 700,
-                  color: 'text.primary',
-                },
-                '& .MuiDataGrid-sortIcon': {
-                  color: 'text.primary',
-                },
-                '& .MuiDataGrid-menuIconButton': {
-                  color: 'text.primary',
-                },
-                '& .MuiDataGrid-virtualScroller': {
+              sx={[
+                {
+                  border: 'none',
+                  height: '100%',
+                  width: '100%',
+                  maxWidth: '100%',
                   bgcolor: 'background.paper',
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: (theme) => theme.palette.grey[300],
+                  },
+                  '& .MuiDataGrid-columnHeaderTitle': {
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  },
+                  '& .MuiDataGrid-sortIcon': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiDataGrid-menuIconButton': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiDataGrid-virtualScroller': {
+                    bgcolor: 'background.paper',
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    bgcolor: 'background.paper',
+                  },
+                  '& .MuiDataGrid-main': {
+                    overflowX: 'auto',
+                  },
+                  '& .MuiDataGrid-virtualScrollerContent': {
+                    width: 'max-content',
+                    minWidth: '100%',
+                  },
                 },
-                '& .MuiDataGrid-footerContainer': {
-                  bgcolor: 'background.paper',
-                },
-                '& .MuiDataGrid-main': {
-                  overflowX: 'auto',
-                },
-                '& .MuiDataGrid-virtualScrollerContent': {
-                  width: 'max-content',
-                  minWidth: '100%',
-                },
-              }}
+                dataGridProps?.sx,
+              ]}
             />
           </Box>
         </Paper>

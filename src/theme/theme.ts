@@ -26,6 +26,13 @@ export const getTheme = (mode: PaletteMode) =>
       },
     },
     components: {
+      MuiTypography: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            color: theme.palette.text.primary,
+          }),
+        },
+      },
       MuiButton: {
         styleOverrides: {
           root: {

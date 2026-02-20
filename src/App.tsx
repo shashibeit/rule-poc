@@ -33,6 +33,7 @@ import { RolesAssignedToSubTenantUsersPage } from './pages/RolesAssignedToSubTen
 import { AddFiPage } from './pages/AddFiPage';
 import { SearchModifyFiPage } from './pages/SearchModifyFiPage';
 import { FiBoardingStatusPage } from './pages/FiBoardingStatusPage';
+import { ModifyDcSubBrandPage } from './pages/ModifyDcSubBrandPage';
 
 const getInitialMode = (): PaletteMode => {
   const stored = window.localStorage.getItem('color-mode');
@@ -245,7 +246,7 @@ function App() {
               path="portfolio-management/modify-dc-sub-brand"
               element={
                 <RoleGuard allowedRoles={['Rule_Reviewer']}>
-                  <PageSkeleton title="Modify DC Sub-Brand" />
+                  <ModifyDcSubBrandPage />
                 </RoleGuard>
               }
             />

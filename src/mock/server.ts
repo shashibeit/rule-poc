@@ -586,6 +586,54 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/searchFiExtDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { clientId = '' } = body;
+
+        const rows = [
+          {
+            clientId: '1001',
+            brandName: 'Visa Platinum',
+            bin: '412345',
+            fiName: 'Alpha FI',
+            portfolioName: 'Alpha',
+            urlAddress: 'https://alpha.example.com/push',
+            emailAddress: 'ops-alpha@example.com',
+            oldBin: '400001',
+          },
+          {
+            clientId: '1002',
+            brandName: 'Master Gold',
+            bin: '512345',
+            fiName: 'Beta FI',
+            portfolioName: 'Beta',
+            urlAddress: 'https://beta.example.com/push',
+            emailAddress: 'ops-beta@example.com',
+            oldBin: '500002',
+          },
+          {
+            clientId: '1003',
+            brandName: 'Debit Core',
+            bin: '612345',
+            fiName: 'Gamma FI',
+            portfolioName: 'Gamma',
+            urlAddress: 'https://gamma.example.com/push',
+            emailAddress: 'ops-gamma@example.com',
+            oldBin: '600003',
+          },
+        ];
+
+        const data = String(clientId).trim()
+          ? rows.filter((row) => row.clientId === String(clientId).trim())
+          : [];
+
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
+          responseList: data,
+        };
+      });
+
       this.get('/rules/v1/getFiCompareResult', () => {
         return {
           code: 'SUCCESS',
@@ -638,6 +686,36 @@ export function makeServer() {
           code: '200',
           message: 'FI details updated successfully',
           responseList: [body],
+        };
+      });
+
+      this.post('/rules/v1/updateBrandingDetails', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+
+        if (
+          !body.bin ||
+          !body.brandName ||
+          !body.clientId ||
+          !body.emailAddress ||
+          !body.fiName ||
+          !body.urlAddress
+        ) {
+          return {
+            code: 'INVALID_DATA_ERROR',
+            message: 'INVALID_DATA_ERROR',
+          };
+        }
+
+        if (String(body.bin) === '000') {
+          return {
+            code: 'INVALID_DATA_ERROR',
+            message: 'INVALID_DATA_ERROR',
+          };
+        }
+
+        return {
+          code: 'SUCCESS',
+          message: 'SUCCESS',
         };
       });
 
