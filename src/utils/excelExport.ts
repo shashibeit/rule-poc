@@ -2,7 +2,7 @@
  * Excel Export Utility
  * 
  * Creates Excel files without using external libraries.
- * Uses HTML table format that Excel can open natively without format warnings.
+ * Uses SpreadsheetML format (XML-based Excel format) that Excel opens without warnings.
  */
 
 export interface ExcelColumn {
@@ -35,64 +35,52 @@ function escapeXML(text: any): string {
 }
 
 /**
- * Generates Excel compatible HTML content
- * Excel can open HTML tables saved as .xls files without format warnings
+ * Generates Excel SpreadsheetML XML content
+ * This is the native XML format that Excel recognizes and opens without warnings
  */
-function generateExcelHTML(options: ExcelExportOptions): string {
+function generateExcelXML(options: ExcelExportOptions): string {
   const { sheetName = 'Sheet1', columns, data } = options;
 
-  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">\n';
-  html += '<head>\n';
-  html += '  <meta charset="UTF-8">\n';
-  html += '  <!--[if gte mso 9]>\n';
-  html += '  <xml>\n';
-  html += '    <x:ExcelWorkbook>\n';
-  html += '      <x:ExcelWorksheets>\n';
-  html += '        <x:ExcelWorksheet>\n';
-  html += `          <x:Name>${escapeXML(sheetName)}</x:Name>\n`;
-  html += '          <x:WorksheetOptions>\n';
-  html += '            <x:DisplayGridlines/>\n';
-  html += '          </x:WorksheetOptions>\n';
-  html += '        </x:ExcelWorksheet>\n';
-  html += '      </x:ExcelWorksheets>\n';
-  html += '    </x:ExcelWorkbook>\n';
-  html += '  </xml>\n';
-  html += '  <![endif]-->\n';
-  html += '  <style>\n';
-  html += '    table { border-collapse: collapse; width: 100%; }\n';
-  html += '    th { background-color: #4472C4; color: white; font-weight: bold; padding: 8px; text-align: left; border: 1px solid #ddd; }\n';
-  html += '    td { padding: 8px; border: 1px solid #ddd; }\n';
-  html += '    tr:nth-child(even) { background-color: #f2f2f2; }\n';
-  html += '  </style>\n';
-  html += '</head>\n';
-  html += '<body>\n';
-  html += '  <table>\n';
+  let html = '<?xml version="1.0"?>\n';
+  html += '<?mso-application progid="Excel.Sheet"?>\n';
+  html += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
+  html += ' xmlns:o="urn:schemas-microsoft-com:office:office"\n';
+  html += ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n';
+  html += ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n';
+  html += ' xmlns:html="http://www.w3.org/TR/REC-html40">\n';
+  
+  html += ' <Styles>\n';
+  html += '  <Style ss:ID="Header">\n';
+  html += '   <Font ss:Bold="1" ss:Color="#FFFFFF"/>\n';
+  html += '   <Interior ss:Color="#4472C4" ss:Pattern="Solid"/>\n';
+  html += '   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>\n';
+  html += '  </Style>\n';
+  html += ' </Styles>\n';
+  
+  html += ` <Worksheet ss:Name="${escapeXML(sheetName)}">\n`;
+  html += '  <Table>\n';
 
   // Header Row
-  html += '    <thead>\n';
-  html += '      <tr>\n';
+  html += '   <Row>\n';
   columns.forEach((col) => {
-    html += `        <th>${escapeXML(col.headerName)}</th>\n`;
+    html += '    <Cell ss:StyleID="Header"><Data ss:Type="String">' + escapeXML(col.headerName) + '</Data></Cell>\n';
   });
-  html += '      </tr>\n';
-  html += '    </thead>\n';
+  html += '   </Row>\n';
 
   // Data Rows
-  html += '    <tbody>\n';
   data.forEach((row) => {
-    html += '      <tr>\n';
+    html += '   <Row>\n';
     columns.forEach((col) => {
       const value = row[col.field];
       const cellValue = value === null || value === undefined ? '' : escapeXML(String(value));
-      html += `        <td>${cellValue}</td>\n`;
+      html += '    <Cell><Data ss:Type="String">' + cellValue + '</Data></Cell>\n';
     });
-    html += '      </tr>\n';
+    html += '   </Row>\n';
   });
-  html += '    </tbody>\n';
 
-  html += '  </table>\n';
-  html += '</body>\n';
-  html += '</html>';
+  html += '  </Table>\n';
+  html += ' </Worksheet>\n';
+  html += '</Workbook>';
 
   return html;
 }
@@ -102,12 +90,15 @@ function generateExcelHTML(options: ExcelExportOptions): string {
  */
 export function downloadExcel(options: ExcelExportOptions): void {
   try {
-    // Generate Excel HTML
-    const htmlContent = generateExcelHTML(options);
+    // Generate Excel SpreadsheetML XML
+    const xmlContent = generateExcelXML(options);
 
-    // Create Blob with proper Excel MIME type
-    const blob = new Blob([htmlContent], {
-      type: 'application/vnd.ms-excel',
+    // Add UTF-8 BOM to help Excel recognize the format and avoid warnings
+    const BOM = '\ufeff';
+    
+    // Create Blob with BOM and proper Excel MIME type
+    const blob = new Blob([BOM + xmlContent], {
+      type: 'application/vnd.ms-excel;charset=utf-8',
     });
 
     // Create download link
