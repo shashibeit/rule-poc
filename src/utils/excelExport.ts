@@ -2,7 +2,7 @@
  * Excel Export Utility
  * 
  * Creates Excel files without using external libraries.
- * Uses XML-based Excel format (SpreadsheetML) that can be opened by Excel and other spreadsheet applications.
+ * Uses HTML table format that Excel can open natively without format warnings.
  */
 
 export interface ExcelColumn {
@@ -19,7 +19,7 @@ export interface ExcelExportOptions {
 }
 
 /**
- * Escapes special XML characters
+ * Escapes special HTML/XML characters
  */
 function escapeXML(text: any): string {
   if (text === null || text === undefined) {
@@ -35,110 +35,66 @@ function escapeXML(text: any): string {
 }
 
 /**
- * Formats a cell value based on its type
+ * Generates Excel compatible HTML content
+ * Excel can open HTML tables saved as .xls files without format warnings
  */
-function getCellValue(value: any): { type: string; value: string } {
-  if (value === null || value === undefined || value === '') {
-    return { type: 'String', value: '' };
-  }
-
-  // Check if it's a number
-  if (typeof value === 'number') {
-    return { type: 'Number', value: String(value) };
-  }
-
-  // Check if string is a valid number
-  const strValue = String(value);
-  if (!isNaN(Number(strValue)) && strValue.trim() !== '') {
-    return { type: 'Number', value: strValue };
-  }
-
-  // Default to string
-  return { type: 'String', value: escapeXML(strValue) };
-}
-
-/**
- * Generates Excel XML content
- */
-function generateExcelXML(options: ExcelExportOptions): string {
+function generateExcelHTML(options: ExcelExportOptions): string {
   const { sheetName = 'Sheet1', columns, data } = options;
 
-  // Start XML document
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<?mso-application progid="Excel.Sheet"?>\n';
-  xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
-  xml += '  xmlns:o="urn:schemas-microsoft-com:office:office"\n';
-  xml += '  xmlns:x="urn:schemas-microsoft-com:office:excel"\n';
-  xml += '  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n';
-  xml += '  xmlns:html="http://www.w3.org/TR/REC-html40">\n';
-
-  // Document Properties
-  xml += '  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">\n';
-  xml += `    <Created>${new Date().toISOString()}</Created>\n`;
-  xml += '  </DocumentProperties>\n';
-
-  // Styles
-  xml += '  <Styles>\n';
-  xml += '    <Style ss:ID="Default" ss:Name="Normal">\n';
-  xml += '      <Alignment ss:Vertical="Bottom"/>\n';
-  xml += '    </Style>\n';
-  xml += '    <Style ss:ID="Header">\n';
-  xml += '      <Font ss:Bold="1" ss:Size="11"/>\n';
-  xml += '      <Interior ss:Color="#4472C4" ss:Pattern="Solid"/>\n';
-  xml += '      <Font ss:Color="#FFFFFF" ss:Bold="1"/>\n';
-  xml += '      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>\n';
-  xml += '      <Borders>\n';
-  xml += '        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>\n';
-  xml += '      </Borders>\n';
-  xml += '    </Style>\n';
-  xml += '    <Style ss:ID="Data">\n';
-  xml += '      <Borders>\n';
-  xml += '        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E7E6E6"/>\n';
-  xml += '      </Borders>\n';
-  xml += '    </Style>\n';
-  xml += '  </Styles>\n';
-
-  // Worksheet
-  xml += `  <Worksheet ss:Name="${escapeXML(sheetName)}">\n`;
-  
-  // Calculate column count
-  const columnCount = columns.length;
-  const rowCount = data.length + 1; // +1 for header
-
-  xml += `    <Table ss:ExpandedColumnCount="${columnCount}" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">\n`;
-
-  // Column widths
-  columns.forEach((col) => {
-    const width = col.width || 100;
-    xml += `      <Column ss:Width="${width}"/>\n`;
-  });
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">\n';
+  html += '<head>\n';
+  html += '  <meta charset="UTF-8">\n';
+  html += '  <!--[if gte mso 9]>\n';
+  html += '  <xml>\n';
+  html += '    <x:ExcelWorkbook>\n';
+  html += '      <x:ExcelWorksheets>\n';
+  html += '        <x:ExcelWorksheet>\n';
+  html += `          <x:Name>${escapeXML(sheetName)}</x:Name>\n`;
+  html += '          <x:WorksheetOptions>\n';
+  html += '            <x:DisplayGridlines/>\n';
+  html += '          </x:WorksheetOptions>\n';
+  html += '        </x:ExcelWorksheet>\n';
+  html += '      </x:ExcelWorksheets>\n';
+  html += '    </x:ExcelWorkbook>\n';
+  html += '  </xml>\n';
+  html += '  <![endif]-->\n';
+  html += '  <style>\n';
+  html += '    table { border-collapse: collapse; width: 100%; }\n';
+  html += '    th { background-color: #4472C4; color: white; font-weight: bold; padding: 8px; text-align: left; border: 1px solid #ddd; }\n';
+  html += '    td { padding: 8px; border: 1px solid #ddd; }\n';
+  html += '    tr:nth-child(even) { background-color: #f2f2f2; }\n';
+  html += '  </style>\n';
+  html += '</head>\n';
+  html += '<body>\n';
+  html += '  <table>\n';
 
   // Header Row
-  xml += '      <Row ss:Height="20">\n';
+  html += '    <thead>\n';
+  html += '      <tr>\n';
   columns.forEach((col) => {
-    xml += '        <Cell ss:StyleID="Header">\n';
-    xml += `          <Data ss:Type="String">${escapeXML(col.headerName)}</Data>\n`;
-    xml += '        </Cell>\n';
+    html += `        <th>${escapeXML(col.headerName)}</th>\n`;
   });
-  xml += '      </Row>\n';
+  html += '      </tr>\n';
+  html += '    </thead>\n';
 
   // Data Rows
+  html += '    <tbody>\n';
   data.forEach((row) => {
-    xml += '      <Row>\n';
+    html += '      <tr>\n';
     columns.forEach((col) => {
-      const cellValue = getCellValue(row[col.field]);
-      xml += '        <Cell ss:StyleID="Data">\n';
-      xml += `          <Data ss:Type="${cellValue.type}">${cellValue.value}</Data>\n`;
-      xml += '        </Cell>\n';
+      const value = row[col.field];
+      const cellValue = value === null || value === undefined ? '' : escapeXML(String(value));
+      html += `        <td>${cellValue}</td>\n`;
     });
-    xml += '      </Row>\n';
+    html += '      </tr>\n';
   });
+  html += '    </tbody>\n';
 
-  xml += '    </Table>\n';
-  xml += '  </Worksheet>\n';
-  xml += '</Workbook>';
+  html += '  </table>\n';
+  html += '</body>\n';
+  html += '</html>';
 
-  return xml;
+  return html;
 }
 
 /**
@@ -146,12 +102,12 @@ function generateExcelXML(options: ExcelExportOptions): string {
  */
 export function downloadExcel(options: ExcelExportOptions): void {
   try {
-    // Generate Excel XML
-    const xmlContent = generateExcelXML(options);
+    // Generate Excel HTML
+    const htmlContent = generateExcelHTML(options);
 
-    // Create Blob
-    const blob = new Blob([xmlContent], {
-      type: 'application/vnd.ms-excel;charset=utf-8;',
+    // Create Blob with proper Excel MIME type
+    const blob = new Blob([htmlContent], {
+      type: 'application/vnd.ms-excel',
     });
 
     // Create download link
