@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { ComponentType, ReactNode, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   DataGrid,
   GridColDef,
@@ -51,7 +51,7 @@ export const withDataGrid = <P extends object>(
       getRowId,
       height = 'auto',
       toolbar,
-      showPageJump = false,
+      showPageJump = true,
       clientSidePagination = false,
       searchText = '',
       onSearchChange,
@@ -62,6 +62,7 @@ export const withDataGrid = <P extends object>(
     } = props;
 
     const [localSearchText, setLocalSearchText] = useState(searchText);
+    const pageInputRef = useRef<HTMLInputElement>(null);
 
     // Enhanced row ID generator that handles missing IDs
     const enhancedGetRowId = useMemo(() => {
@@ -117,6 +118,10 @@ export const withDataGrid = <P extends object>(
     const handlePaginationModelChange = (model: GridPaginationModel) => {
       if (model.page !== page) {
         onPageChange(model.page);
+        // Maintain focus in the textbox after navigation via arrows
+        setTimeout(() => {
+          pageInputRef.current?.focus();
+        }, 0);
       }
       if (model.pageSize !== pageSize) {
         onPageSizeChange(model.pageSize);
@@ -151,6 +156,16 @@ export const withDataGrid = <P extends object>(
                   return;
                 }
                 setPageInput(raw);
+                
+                // Navigate immediately when valid page number is entered
+                const pageNum = Number(raw);
+                if (Number.isFinite(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+                  onPageChange(pageNum - 1);
+                  // Maintain focus in the textbox after navigation
+                  setTimeout(() => {
+                    pageInputRef.current?.focus();
+                  }, 0);
+                }
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -177,6 +192,7 @@ export const withDataGrid = <P extends object>(
               size="small"
               sx={{ width: 90 }}
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+              inputRef={pageInputRef}
             />
             <Typography variant="body2" color="text.secondary">
               of {totalPages}
