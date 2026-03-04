@@ -280,7 +280,7 @@ const HotlistAuditGrid = withDataGrid<HotlistAuditHeaderProps>(HotlistAuditHeade
 
 export const HotlistAuditHistoryPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, loading, error } = useAppSelector((state) => state.hotlistAuditHistory);
+  const { records, loading, error: _ } = useAppSelector((state) => state.hotlistAuditHistory);
   const [mode, setMode] = useState<'fi' | 'emergency' | 'risky'>('fi');
   const [fiHotlistName, setFiHotlistName] = useState('');
   const [emergencyHotlistName, setEmergencyHotlistName] = useState('');

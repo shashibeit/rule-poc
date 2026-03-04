@@ -24,6 +24,12 @@ export interface UserReportRecord {
   groupName: string;
   userStatus: string;
   emailEnable: string;
+  userCreateDate: string;
+  sLoginKey: string;
+  dateLastLogin: string;
+  noActivityDays: string;
+  neverLoggedin: string;
+  dpServiceCode: string;
 }
 
 export interface UniqueUserLoginRecord {

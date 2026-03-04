@@ -1,11 +1,9 @@
-import { ReactNode, useMemo, ChangeEvent, FC, useState, useEffect, useCallback, useRef } from 'react';
+import { ReactNode, useMemo, ChangeEvent, FC, useState, useEffect, useRef } from 'react';
 import {
   DataGrid,
   GridColDef,
   GridRowsProp,
   GridPaginationModel,
-  GridFooterContainer,
-  GridPagination,
 } from '@mui/x-data-grid';
 import { Box, TextField, InputAdornment, Paper, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -51,7 +49,7 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
   showPageJump = true,
 }) => {
   const [localSearchText, setLocalSearchText] = useState(searchText);
-  const [pageInput, setPageInput] = useState(String(page + 1));
+  const [pageJumpValue, setPageJumpValue] = useState(String(page + 1));
   const pageInputRef = useRef<HTMLInputElement>(null);
   
   // Enhanced row ID generator that handles missing IDs
@@ -100,9 +98,9 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
     setLocalSearchText(searchText);
   }, [searchText]);
 
-  // Update page input when page changes
+  // Update page input when page changes externally
   useEffect(() => {
-    setPageInput(String(page + 1));
+    setPageJumpValue(String(page + 1));
   }, [page]);
 
   const debouncedSearch = useMemo(
@@ -133,92 +131,63 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
   const handlePaginationModelChange = (model: GridPaginationModel) => {
     if (model.page !== page) {
       onPageChange(model.page);
-      // Maintain focus in the textbox after navigation via arrows
-      setTimeout(() => {
-        pageInputRef.current?.focus();
-      }, 0);
     }
     if (model.pageSize !== pageSize) {
       onPageSizeChange(model.pageSize);
     }
   };
 
-  // Custom footer with page jump functionality
-  const Footer = useCallback(() => (
-    <GridFooterContainer
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: 1,
-        gap: 2,
-      }}
-    >
-      <GridPagination />
-      {showPageJump && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            Go to page
-          </Typography>
-          <TextField
-            value={pageInput}
-            onChange={(e) => {
-              const raw = e.target.value;
-              if (raw === '') {
-                setPageInput('');
-                return;
-              }
-              if (!/^[0-9]+$/.test(raw)) {
-                return;
-              }
-              setPageInput(raw);
-              
-              // Navigate immediately when valid page number is entered
-              const pageNum = Number(raw);
-              if (Number.isFinite(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
-                onPageChange(pageNum - 1);
-                // Maintain focus in the textbox after navigation
-                setTimeout(() => {
-                  pageInputRef.current?.focus();
-                }, 0);
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const next = Number(pageInput);
-                if (Number.isFinite(next)) {
-                  const clamped = Math.min(Math.max(1, next), totalPages);
-                  onPageChange(clamped - 1);
-                } else {
-                  setPageInput(String(page + 1));
-                }
-              }
-            }}
-            onBlur={() => {
-              const next = Number(pageInput);
-              if (pageInput === '') {
-                setPageInput(String(page + 1));
-                return;
-              }
-              if (Number.isFinite(next)) {
-                const clamped = Math.min(Math.max(1, next), totalPages);
-                onPageChange(clamped - 1);
-              }
-            }}
-            size="small"
-            sx={{ width: 90 }}
-            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-            inputRef={pageInputRef}
-          />
-          <Typography variant="body2" color="text.secondary">
-            of {totalPages}
-          </Typography>
-        </Box>
-      )}
-    </GridFooterContainer>
-  ), [showPageJump, pageInput, totalPages, page, onPageChange]);
+  // Page jump handlers
+  const handlePageJumpChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    
+    // Allow empty string
+    if (raw === '') {
+      setPageJumpValue('');
+      return;
+    }
+    
+    // Only allow numeric input
+    if (!/^[0-9]+$/.test(raw)) {
+      return;
+    }
+    
+    setPageJumpValue(raw);
+  };
 
-  const slots = useMemo(() => ({ footer: Footer }), [Footer]);
+  const handlePageJumpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const next = Number(pageJumpValue);
+      const maxPage = Math.max(1, Math.ceil(processedData.totalCount / pageSize));
+      if (Number.isFinite(next) && next >= 1 && next <= maxPage) {
+        onPageChange(next - 1);
+      } else {
+        setPageJumpValue(String(page + 1));
+      }
+      pageInputRef.current?.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setPageJumpValue(String(page + 1));
+      pageInputRef.current?.blur();
+    }
+  };
+
+  const handlePageJumpBlur = () => {
+    const next = Number(pageJumpValue);
+    const maxPage = Math.max(1, Math.ceil(processedData.totalCount / pageSize));
+    
+    if (pageJumpValue === '') {
+      setPageJumpValue(String(page + 1));
+      return;
+    }
+    
+    if (Number.isFinite(next) && next >= 1 && next <= maxPage) {
+      onPageChange(next - 1);
+    } else {
+      setPageJumpValue(String(page + 1));
+    }
+  };
 
   return (
     <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -250,7 +219,7 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
         <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>{toolbarActions}</Box>
       </Box>
 
-      <Box sx={{ flexGrow: 1, px: 2, pb: 2 }}>
+      <Box sx={{ flexGrow: 1, minHeight: 0, minWidth: 0, overflow: 'hidden' }}>
         <DataGrid
           rows={processedData.paginatedData}
           columns={columns}
@@ -262,10 +231,63 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
           onPaginationModelChange={handlePaginationModelChange}
           getRowId={enhancedGetRowId}
           disableRowSelectionOnClick
-          slots={slots}
-          sx={{ border: 'none' }}
+          sx={{
+            border: 'none',
+            height: '100%',
+            width: '100%',
+            '& .MuiDataGrid-columnHeaders': {
+              overflow: 'hidden !important',
+            },
+            '& .MuiDataGrid-columnHeaderTitle': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            },
+            '& .MuiDataGrid-main': {
+              overflow: 'hidden',
+            },
+            '& .MuiDataGrid-cell': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            },
+          }}
         />
       </Box>
+
+      {showPageJump && (
+        <Box
+          sx={{
+            px: 2,
+            py: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 1,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Go to page
+          </Typography>
+          <TextField
+            value={pageJumpValue}
+            onChange={handlePageJumpChange}
+            onKeyDown={handlePageJumpKeyDown}
+            onBlur={handlePageJumpBlur}
+            size="small"
+            sx={{ width: 90 }}
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+            inputRef={pageInputRef}
+            autoComplete="off"
+          />
+          <Typography variant="body2" color="text.secondary">
+            of {totalPages}
+          </Typography>
+        </Box>
+      )}
     </Paper>
   );
 };

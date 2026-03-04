@@ -14,7 +14,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
  * Features:
  * - Loads all user report data from mock API via Redux
  * - Client-side pagination and search
- * - Multi-field search functionality (clientId, portfolioName, fullName, userName, groupName, userStatus, emailEnable)
+ * - Multi-field search functionality (clientId, portfolioName, fullName, userName, groupName, userStatus, emailEnable, userCreateDate, sLoginKey, dateLastLogin, noActivityDays, neverLoggedin, dpServiceCode)
  * - Visual status indicators with chips
  * - No server pagination calls after initial load
  */
@@ -97,7 +97,12 @@ const UserReportHeader: FC<UserReportHeaderProps> = ({
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 0.5 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+            OR
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, md: 3.5 }}>
           <TextField
             fullWidth
             size="small"
@@ -287,6 +292,47 @@ export const UserReportPage: FC = () => {
           />
         )
       },
+      { 
+        field: 'userCreateDate', 
+        headerName: 'User Create Date', 
+        width: 140,
+        valueFormatter: (value) => value || 'N/A'
+      },
+      { 
+        field: 'sLoginKey', 
+        headerName: 'Login Key', 
+        width: 140,
+        valueFormatter: (value) => value || 'N/A'
+      },
+      { 
+        field: 'dateLastLogin', 
+        headerName: 'Last Login Date', 
+        width: 140,
+        valueFormatter: (value) => value || 'Never'
+      },
+      { 
+        field: 'noActivityDays', 
+        headerName: 'Inactivity Days', 
+        width: 130,
+        type: 'number'
+      },
+      { 
+        field: 'neverLoggedin', 
+        headerName: 'Never Logged In', 
+        width: 140,
+        renderCell: (params) => (
+          <Chip 
+            label={params.value || 'No'} 
+            size="small" 
+            color={params.value === 'Yes' ? 'warning' : 'success'}
+          />
+        )
+      },
+      { 
+        field: 'dpServiceCode', 
+        headerName: 'Service Code', 
+        width: 130
+      },
     ],
     []
   );
@@ -316,7 +362,21 @@ export const UserReportPage: FC = () => {
     clientSidePagination: true,
     searchText,
     onSearchChange: setSearchText,
-    searchFields: ['clientId', 'portfolioName', 'fullName', 'userName', 'groupName', 'userStatus', 'emailEnable'],
+    searchFields: [
+      'clientId', 
+      'portfolioName', 
+      'fullName', 
+      'userName', 
+      'groupName', 
+      'userStatus', 
+      'emailEnable',
+      'userCreateDate',
+      'sLoginKey',
+      'dateLastLogin',
+      'noActivityDays',
+      'neverLoggedin',
+      'dpServiceCode'
+    ],
   };
 
   return (

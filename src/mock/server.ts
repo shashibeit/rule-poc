@@ -219,9 +219,18 @@ export function makeServer() {
           { clientId: '1005', portfolioName: 'Omega', fullName: 'Matthew Lewis', userName: 'matthew.lewis', groupName: 'Marketing Group', userStatus: 'Active', emailEnable: 'Yes' }
         ];
 
+        const serviceCodes = ['DP001', 'DP002', 'DP003', 'DP004', 'DP005'];
+
         const totalRecords = 250;
         const data = Array.from({ length: totalRecords }, (_v, i) => {
           const user = users[i % users.length];
+          const createDate = new Date();
+          createDate.setDate(createDate.getDate() - (365 + i * 2)); // Created 1-2+ years ago
+          
+          const lastLoginDate = new Date();
+          const hasNeverLoggedIn = i % 10 === 0; // 10% never logged in
+          const activityDays = hasNeverLoggedIn ? 0 : Math.floor(Math.random() * 90) + 1; // 1-90 days
+          lastLoginDate.setDate(lastLoginDate.getDate() - activityDays);
 
           return {
             id: String(i + 1),
@@ -232,6 +241,12 @@ export function makeServer() {
             groupName: user.groupName,
             userStatus: user.userStatus,
             emailEnable: user.emailEnable,
+            userCreateDate: createDate.toISOString().split('T')[0],
+            sLoginKey: hasNeverLoggedIn ? '' : `LOGIN_${String(i + 1).padStart(6, '0')}`,
+            dateLastLogin: hasNeverLoggedIn ? '' : lastLoginDate.toISOString().split('T')[0],
+            noActivityDays: String(activityDays),
+            neverLoggedin: hasNeverLoggedIn ? 'Yes' : 'No',
+            dpServiceCode: serviceCodes[i % serviceCodes.length],
           };
         });
 
@@ -270,8 +285,17 @@ export function makeServer() {
           { clientId: '1005', portfolioName: 'Omega', fullName: 'Matthew Lewis', userName: 'matthew.lewis', groupName: 'Marketing Group', userStatus: 'Active', emailEnable: 'Yes' }
         ];
 
+        const serviceCodes = ['DP001', 'DP002', 'DP003', 'DP004', 'DP005'];
+
         let data = Array.from({ length: 250 }, (_v, i) => {
           const user = users[i % users.length];
+          const createDate = new Date();
+          createDate.setDate(createDate.getDate() - (365 + i * 2)); // Created 1-2+ years ago
+          
+          const lastLoginDate = new Date();
+          const hasNeverLoggedIn = i % 10 === 0; // 10% never logged in
+          const activityDays = hasNeverLoggedIn ? 0 : Math.floor(Math.random() * 90) + 1; // 1-90 days
+          lastLoginDate.setDate(lastLoginDate.getDate() - activityDays);
 
           return {
             id: String(i + 1),
@@ -282,6 +306,12 @@ export function makeServer() {
             groupName: user.groupName,
             userStatus: user.userStatus,
             emailEnable: user.emailEnable,
+            userCreateDate: createDate.toISOString().split('T')[0],
+            sLoginKey: hasNeverLoggedIn ? '' : `LOGIN_${String(i + 1).padStart(6, '0')}`,
+            dateLastLogin: hasNeverLoggedIn ? '' : lastLoginDate.toISOString().split('T')[0],
+            noActivityDays: String(activityDays),
+            neverLoggedin: hasNeverLoggedIn ? 'Yes' : 'No',
+            dpServiceCode: serviceCodes[i % serviceCodes.length],
           };
         });
 
