@@ -18,7 +18,9 @@ import {
   fetchFiHotlistAll,
   fetchFiHotlistSearch,
   HotlistRecord,
+  clearFiHotlistRecords,
 } from '@/features/reports/fiHotlistCheckSlice';
+import { downloadExcel } from '@/utils/excelExport';
 
 export const FiHotlistCheckPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -49,6 +51,66 @@ export const FiHotlistCheckPage: FC = () => {
   );
 
   const resetErrors = () => setErrors({});
+
+  const handleDownloadAllData = () => {
+    if (records.length === 0) {
+      alert('No data to download');
+      return;
+    }
+
+    const columns = [
+      { field: 'clientId', headerName: 'Client ID' },
+      { field: 'core', headerName: 'Core' },
+      { field: 'lite', headerName: 'Lite' },
+      { field: 'liteBlocking', headerName: 'Lite & Blocking' },
+      { field: 'protectBuy', headerName: 'Protect Buy' },
+      { field: 'hotlistService', headerName: 'Hotlist Service' },
+      { field: 'opServiceCode', headerName: 'OP Service Code' },
+      { field: 'validationStatus', headerName: 'Validation Status' },
+      { field: 'portfolioName', headerName: 'Portfolio Name' },
+      { field: 'hotlistLastUpdatedBy', headerName: 'Hotlist Last Updated By' },
+      { field: 'hotlistLastUpdatedOn', headerName: 'Hotlist Last Updated On' },
+    ];
+
+    downloadExcel({
+      filename: `FI_Hotlist_Details_${new Date().getTime()}`,
+      sheetName: 'FI Hotlist Details',
+      columns,
+      data: records,
+    });
+  };
+
+  const handleDownloadValidationFailed = () => {
+    const failedRecords = records.filter(
+      (record) => record.validationStatus === 'false' || record.validationStatus === 'False' || record.validationStatus === 'FAILED'
+    );
+    
+    if (failedRecords.length === 0) {
+      alert('No validation failed records to download');
+      return;
+    }
+
+    const columns = [
+      { field: 'clientId', headerName: 'Client ID' },
+      { field: 'core', headerName: 'Core' },
+      { field: 'lite', headerName: 'Lite' },
+      { field: 'liteBlocking', headerName: 'Lite & Blocking' },
+      { field: 'protectBuy', headerName: 'Protect Buy' },
+      { field: 'hotlistService', headerName: 'Hotlist Service' },
+      { field: 'opServiceCode', headerName: 'OP Service Code' },
+      { field: 'validationStatus', headerName: 'Validation Status' },
+      { field: 'portfolioName', headerName: 'Portfolio Name' },
+      { field: 'hotlistLastUpdatedBy', headerName: 'Hotlist Last Updated By' },
+      { field: 'hotlistLastUpdatedOn', headerName: 'Hotlist Last Updated On' },
+    ];
+
+    downloadExcel({
+      filename: `FI_Hotlist_Validation_Failed_${new Date().getTime()}`,
+      sheetName: 'Validation Failed',
+      columns,
+      data: failedRecords,
+    });
+  };
 
   const handleSearchSingle = () => {
     const nextErrors: typeof errors = {};
@@ -138,6 +200,7 @@ export const FiHotlistCheckPage: FC = () => {
           setFileName('');
           setDate(null);
           resetErrors();
+          dispatch(clearFiHotlistRecords());
         }}
       >
         <FormControlLabel value="single" control={<Radio />} label="Search by Single FI" />
@@ -281,6 +344,17 @@ export const FiHotlistCheckPage: FC = () => {
         <Typography variant="body2" color="error" sx={{ mt: 2 }}>
           {error}
         </Typography>
+      )}
+
+      {records.length > 0 && (
+        <Box sx={{ mt: 3, mb: 2, display: 'flex', gap: 2 }}>
+          <Button variant="contained" color="primary" onClick={handleDownloadAllData}>
+            Download Client Hotlist Details
+          </Button>
+          <Button variant="contained" color="warning" onClick={handleDownloadValidationFailed}>
+            Download Client Hotlist Details (Validation Failed)
+          </Button>
+        </Box>
       )}
 
       <Box sx={{ mt: 3 }}>

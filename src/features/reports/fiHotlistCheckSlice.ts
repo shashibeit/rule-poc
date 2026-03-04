@@ -99,6 +99,10 @@ const fiHotlistCheckSlice = createSlice({
     setFiHotlistRecords: (state, action: PayloadAction<HotlistRecordInput[]>) => {
       state.records = normalizeHotlistRecords(action.payload);
     },
+    clearFiHotlistRecords: (state) => {
+      state.records = [];
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -129,5 +133,5 @@ const fiHotlistCheckSlice = createSlice({
   },
 });
 
-export const { setFiHotlistRecords } = fiHotlistCheckSlice.actions;
+export const { setFiHotlistRecords, clearFiHotlistRecords } = fiHotlistCheckSlice.actions;
 export default fiHotlistCheckSlice.reducer;
