@@ -29,6 +29,7 @@ export const fetchOperationHistory = createAsyncThunk(
       code: string;
       message: string;
       StagingRefreshHistoryList: OperationHistoryRecord[];
+      totalRecords: number;
     }>(`/rules/v1/refreshHistory/${params.operationType}`, {
       page: params.page,
       pageSize: params.pageSize
@@ -44,6 +45,7 @@ export const fetchOperationHistoryAll = createAsyncThunk(
       code: string;
       message: string;
       StagingRefreshHistoryList: OperationHistoryRecord[];
+      totalRecords: number;
     }>(`/rules/v1/refreshHistory/${params.operationType}/all`);
     return response;
   }
@@ -66,7 +68,7 @@ const operationHistorySlice = createSlice({
       .addCase(fetchOperationHistory.fulfilled, (state, action) => {
         state.loading = false;
         state.records = action.payload.StagingRefreshHistoryList || [];
-        state.total = action.payload.StagingRefreshHistoryList?.length || 0;
+        state.total = action.payload.totalRecords || 0;
       })
       .addCase(fetchOperationHistory.rejected, (state, action) => {
         state.loading = false;
@@ -79,7 +81,7 @@ const operationHistorySlice = createSlice({
       .addCase(fetchOperationHistoryAll.fulfilled, (state, action) => {
         state.loading = false;
         state.records = action.payload.StagingRefreshHistoryList || [];
-        state.total = action.payload.StagingRefreshHistoryList?.length || 0;
+        state.total = action.payload.totalRecords || 0;
       })
       .addCase(fetchOperationHistoryAll.rejected, (state, action) => {
         state.loading = false;

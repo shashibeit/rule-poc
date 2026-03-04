@@ -262,30 +262,35 @@ export const AppDataGrid: FC<AppDataGridProps> = ({
             py: 2,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: 1,
+            justifyContent: 'space-between',
+            gap: 2,
             borderTop: '1px solid',
             borderColor: 'divider',
             bgcolor: 'background.paper',
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Go to page
+            Total Records: <strong>{processedData.totalCount}</strong>
           </Typography>
-          <TextField
-            value={pageJumpValue}
-            onChange={handlePageJumpChange}
-            onKeyDown={handlePageJumpKeyDown}
-            onBlur={handlePageJumpBlur}
-            size="small"
-            sx={{ width: 90 }}
-            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-            inputRef={pageInputRef}
-            autoComplete="off"
-          />
-          <Typography variant="body2" color="text.secondary">
-            of {totalPages}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Go to page
+            </Typography>
+            <TextField
+              value={pageJumpValue}
+              onChange={handlePageJumpChange}
+              onKeyDown={handlePageJumpKeyDown}
+              onBlur={handlePageJumpBlur}
+              size="small"
+              sx={{ width: 90 }}
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+              inputRef={pageInputRef}
+              autoComplete="off"
+            />
+            <Typography variant="body2" color="text.secondary">
+              of {totalPages}
+            </Typography>
+          </Box>
         </Box>
       )}
     </Paper>
