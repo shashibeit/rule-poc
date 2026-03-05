@@ -1,21 +1,57 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchFiBoardingStatus, FiBoardingStatusRecord } from '@/features/reports/fiBoardingStatusSlice';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
-const FiBoardingStatusHeader: FC = () => {
+interface FiBoardingStatusHeaderProps {
+  onDownloadExcel: () => void;
+  onDownloadCSV: () => void;
+  isExporting: boolean;
+  hasData: boolean;
+}
+
+const FiBoardingStatusHeader: FC<FiBoardingStatusHeaderProps> = ({
+  onDownloadExcel,
+  onDownloadCSV,
+  isExporting,
+  hasData,
+}) => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        FI Boarding Status
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">
+          FI Boarding Status
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadExcel}
+            disabled={isExporting || !hasData}
+          >
+            Download Excel
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadCSV}
+            disabled={isExporting || !hasData}
+          >
+            Download CSV
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 };
 
-const FiBoardingStatusGrid = withDataGrid(FiBoardingStatusHeader);
+const FiBoardingStatusGrid = withDataGrid<FiBoardingStatusHeaderProps>(FiBoardingStatusHeader);
 
 export const FiBoardingStatusPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -40,6 +76,16 @@ export const FiBoardingStatusPage: FC = () => {
     []
   );
 
+  // Excel export hook
+  const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
+    records,
+    columns,
+    {
+      filename: 'fi-boarding-status',
+      sheetName: 'FI Boarding Status',
+    }
+  );
+
   const props: DataGridViewProps = {
     rows: records,
     columns,
@@ -57,6 +103,10 @@ export const FiBoardingStatusPage: FC = () => {
   return (
     <FiBoardingStatusGrid
       {...props}
+      onDownloadExcel={exportToExcel}
+      onDownloadCSV={exportToCSV}
+      isExporting={isExporting}
+      hasData={records.length > 0}
       toolbar={
         error ? (
           <Typography variant="body2" color="error">
