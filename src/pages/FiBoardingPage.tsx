@@ -70,6 +70,7 @@ export const FiBoardingPage: FC = () => {
 
   const columns = useMemo<GridColDef<NotBoardedFiRecord>[]>(
     () => [
+      { field: '__check__', headerName: '', width: 50, hideable: false },
       { field: 'clientId', headerName: 'Client ID', width: 140 },
       { field: 'portfolioName', headerName: 'Portfolio Name', width: 190 },
       { field: 'fiName', headerName: 'FI Name', width: 220 },

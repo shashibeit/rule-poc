@@ -65,7 +65,7 @@ export const FiBoardingStatusPage: FC = () => {
 
   const columns = useMemo<GridColDef<FiBoardingStatusRecord>[]>(
     () => [
-      { field: 'clientId', headerName: 'Client ID', width: 140 },
+      { field: 'clientId', headerName: 'Client ID', width: 140, hideable: false },
       { field: 'serviceCode', headerName: 'Service Code', width: 140 },
       { field: 'fiName', headerName: 'FI Name', width: 180 },
       { field: 'onFiDetails', headerName: 'On FI Details', width: 160 },
