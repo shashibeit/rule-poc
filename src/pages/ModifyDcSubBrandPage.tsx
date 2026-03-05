@@ -161,7 +161,8 @@ export const ModifyDcSubBrandPage: FC = () => {
     return localRows.filter((row) => {
       const original = row.id ? initialRowsMap[String(row.id)] : undefined;
       if (!original) {
-        return true;
+        // New row - only include if it has been filled in
+        return row.bin.trim() !== '' || row.brandName.trim() !== '';
       }
       return row.bin !== original.bin || row.brandName !== original.brandName;
     });
@@ -172,10 +173,13 @@ export const ModifyDcSubBrandPage: FC = () => {
     const nextErrors: Record<string, string> = {};
 
     changedRows.forEach((row) => {
-      if (!row.brandName.trim()) {
-        nextErrors[String(row.id)] = 'SUB Brand is required';
-      } else if (!/^\d{3,12}$/.test(row.bin.trim())) {
+      // Check if BIN is empty
+      if (!/^\d{3,12}$/.test(row.bin.trim())) {
         nextErrors[String(row.id)] = 'BIN must be 3 to 12 digits only';
+      }
+      // Check if brandName is empty (only if no bin error)
+      else if (!row.brandName.trim()) {
+        nextErrors[String(row.id)] = 'SUB Brand is required';
       }
     });
 
@@ -194,16 +198,22 @@ export const ModifyDcSubBrandPage: FC = () => {
     }
 
     for (const row of changedRows) {
-      const result = await dispatch(
-        updateBrandingDetails({
-          bin: row.bin.trim(),
-          brandName: row.brandName.trim(),
-          clientId: row.clientId,
-          emailAddress: row.emailAddress,
-          fiName: row.fiName,
-          urlAddress: row.urlAddress,
-        })
-      );
+      const original = row.id ? initialRowsMap[String(row.id)] : undefined;
+      const payload: any = {
+        bin: row.bin.trim(),
+        brandName: row.brandName.trim(),
+        clientId: row.clientId,
+        emailAddress: null,
+        fiName: row.fiName,
+        urlAddress: null,
+      };
+
+      // If bin changed, include oldBin
+      if (original && original.bin !== row.bin) {
+        payload.oldBin = original.bin;
+      }
+
+      const result = await dispatch(updateBrandingDetails(payload));
 
       if (updateBrandingDetails.rejected.match(result)) {
         break;
@@ -249,6 +259,7 @@ export const ModifyDcSubBrandPage: FC = () => {
           }
 
           setValidationError(undefined);
+          setRowErrors({});
           setPage(0);
           dispatch(clearModifyDcSubBrandSaveStatus());
           dispatch(fetchModifyDcSubBrand({ clientId: trimmed }));
@@ -256,6 +267,7 @@ export const ModifyDcSubBrandPage: FC = () => {
         onClear={() => {
           setClientId('');
           setValidationError(undefined);
+          setRowErrors({});
           setPage(0);
           dispatch(clearModifyDcSubBrand());
         }}
@@ -283,8 +295,8 @@ export const ModifyDcSubBrandPage: FC = () => {
           setValidationError(undefined);
         }}
         onSave={() => {
-          setValidationError(undefined);
           dispatch(clearModifyDcSubBrandSaveStatus());
+          setValidationError(undefined);
 
           if (!validateRowsForSave()) {
             setValidationError('Please fix row validation errors before saving');
