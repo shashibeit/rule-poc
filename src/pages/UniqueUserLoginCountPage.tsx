@@ -5,6 +5,8 @@ import { AppDataGrid } from '@/components/datagrid/AppDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchUniqueUserLoginAllData, fetchUniqueUserLoginSearchData } from '@/features/reports/uniqueUserLoginSlice';
 import { UniqueUserLoginRecord } from '@/types';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 interface UniqueUserLoginHeaderProps {
   clientId: string;
@@ -18,6 +20,10 @@ interface UniqueUserLoginHeaderProps {
   onSearch: () => void;
   onSearchAll: () => void;
   onClear: () => void;
+  onDownloadExcel: () => void;
+  onDownloadCSV: () => void;
+  isExporting: boolean;
+  hasData: boolean;
 }
 
 const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
@@ -29,12 +35,38 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
   onSearch,
   onSearchAll,
   onClear,
+  onDownloadExcel,
+  onDownloadCSV,
+  isExporting,
+  hasData,
 }) => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Unique User Login Count Report
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="h4">
+          Unique User Login Count Report
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadExcel}
+            disabled={isExporting || !hasData}
+          >
+            Download Excel
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadCSV}
+            disabled={isExporting || !hasData}
+          >
+            Download CSV
+          </Button>
+        </Box>
+      </Box>
 
       <Grid container spacing={2} alignItems="center">
         <Grid size={{ xs: 12, md: 3 }}>
@@ -48,7 +80,7 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
             helperText={errors.clientId}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <TextField
             fullWidth
             size="small"
@@ -59,7 +91,7 @@ const UniqueUserLoginHeader: FC<UniqueUserLoginHeaderProps> = ({
             helperText={errors.fiShortName}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="contained" onClick={onSearch}>
               Search
@@ -136,6 +168,24 @@ export const UniqueUserLoginCountPage: FC = () => {
     []
   );
 
+  // Filter data based on applied search criteria
+  const filteredData = useMemo(() => {
+    if (!hasApplied) {
+      return [];
+    }
+    return records;
+  }, [hasApplied, records]);
+
+  // Excel export hook
+  const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
+    filteredData,
+    columns,
+    {
+      filename: 'unique-user-login-count-report',
+      sheetName: 'Unique User Login',
+    }
+  );
+
   return (
     <Box sx={{ p: 2 }}>
       <UniqueUserLoginHeader
@@ -181,10 +231,14 @@ export const UniqueUserLoginCountPage: FC = () => {
           setMode('search');
           setHasApplied(false);
         }}
+        onDownloadExcel={exportToExcel}
+        onDownloadCSV={exportToCSV}
+        isExporting={isExporting}
+        hasData={filteredData.length > 0}
       />
       <Box sx={{ mt: 2, width: '100%', maxWidth: '100%' }}>
         <AppDataGrid
-          rows={hasApplied ? records : []}
+          rows={filteredData}
           columns={columns}
           loading={hasApplied ? loading : false}
           clientSidePagination={true}
