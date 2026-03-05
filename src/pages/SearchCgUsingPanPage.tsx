@@ -13,6 +13,8 @@ import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchCompromisedIdByPan, PanSearchRecord } from '@/features/reports/searchCgUsingPanSlice';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 interface SearchCgUsingPanHeaderProps {
   mode: 'single' | 'multiple';
@@ -23,6 +25,10 @@ interface SearchCgUsingPanHeaderProps {
   onTokenizedPanChange: (value: string) => void;
   onFileChange: (file: File | null) => void;
   onSearch: () => void;
+  onDownloadExcel: () => void;
+  onDownloadCSV: () => void;
+  isExporting: boolean;
+  hasData: boolean;
 }
 
 const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
@@ -34,12 +40,38 @@ const SearchCgUsingPanHeader: FC<SearchCgUsingPanHeaderProps> = ({
   onTokenizedPanChange,
   onFileChange,
   onSearch,
+  onDownloadExcel,
+  onDownloadCSV,
+  isExporting,
+  hasData,
 }) => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Search CG Using PAN
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">
+          Search CG Using PAN
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadExcel}
+            disabled={isExporting || !hasData}
+          >
+            Download Excel
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadCSV}
+            disabled={isExporting || !hasData}
+          >
+            Download CSV
+          </Button>
+        </Box>
+      </Box>
 
       <RadioGroup
         row
@@ -124,6 +156,16 @@ export const SearchCgUsingPanPage: FC = () => {
     []
   );
 
+  // Excel export hook
+  const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
+    records,
+    columns,
+    {
+      filename: 'search-cg-using-pan',
+      sheetName: 'Search CG Using PAN',
+    }
+  );
+
   const props: DataGridViewProps = {
     rows: records,
     columns,
@@ -156,6 +198,10 @@ export const SearchCgUsingPanPage: FC = () => {
       onFileChange={(file) => {
         setFileName(file?.name ?? '');
       }}
+      onDownloadExcel={exportToExcel}
+      onDownloadCSV={exportToCSV}
+      isExporting={isExporting}
+      hasData={records.length > 0}
       onSearch={() => {
         if (mode === 'single') {
           const trimmed = tokenizedPan.trim();

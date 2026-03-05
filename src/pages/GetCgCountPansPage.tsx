@@ -4,12 +4,18 @@ import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchCgCountPans, CgCountRecord } from '@/features/reports/getCgCountPansSlice';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 interface GetCgCountPansHeaderProps {
   compromiseIncidentId: string;
   error?: string;
   onCompromiseIncidentIdChange: (value: string) => void;
   onSearch: () => void;
+  onDownloadExcel: () => void;
+  onDownloadCSV: () => void;
+  isExporting: boolean;
+  hasData: boolean;
 }
 
 const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
@@ -17,12 +23,38 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
   error,
   onCompromiseIncidentIdChange,
   onSearch,
+  onDownloadExcel,
+  onDownloadCSV,
+  isExporting,
+  hasData,
 }) => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Get CG Count and PANs
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">
+          Get CG Count and PANs
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadExcel}
+            disabled={isExporting || !hasData}
+          >
+            Download Excel
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadCSV}
+            disabled={isExporting || !hasData}
+          >
+            Download CSV
+          </Button>
+        </Box>
+      </Box>
 
       <Grid container spacing={2} alignItems="center">
         <Grid size={{ xs: 12, md: 4 }}>
@@ -70,6 +102,16 @@ export const GetCgCountPansPage: FC = () => {
     []
   );
 
+  // Excel export hook
+  const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
+    hasApplied ? records : [],
+    columns,
+    {
+      filename: 'cg-count-pans',
+      sheetName: 'CG Count and PANs',
+    }
+  );
+
   const props: DataGridViewProps = {
     rows: hasApplied ? records : [],
     columns,
@@ -91,6 +133,10 @@ export const GetCgCountPansPage: FC = () => {
       compromiseIncidentId={compromiseIncidentId}
       error={validationError || error || undefined}
       onCompromiseIncidentIdChange={setCompromiseIncidentId}
+      onDownloadExcel={exportToExcel}
+      onDownloadCSV={exportToCSV}
+      isExporting={isExporting}
+      hasData={hasApplied && records.length > 0}
       onSearch={() => {
         const trimmed = compromiseIncidentId.trim();
         if (!trimmed) {
