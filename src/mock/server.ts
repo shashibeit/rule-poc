@@ -1323,8 +1323,9 @@ export function makeServer() {
         }
 
         const totalRecordsFiltered = data.length;
-        const start = pageNum * pageSize;
-        const end = start + pageSize;
+        // pageNum is now the start record (1, 11, 21...) and pageSize is the end record (10, 20, 30...)
+        const start = pageNum - 1; // Convert to 0-based index
+        const end = pageSize; // End record number
         const paginated = data.slice(start, end);
 
         return {

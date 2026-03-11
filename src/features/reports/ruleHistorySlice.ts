@@ -44,14 +44,20 @@ export const fetchRuleHistory = createAsyncThunk(
       return `${day}-${month}-${year}`;
     };
 
+    // Calculate pageNum and pageSize in sequence based on pageSize parameter
+    // Example: if pageSize=10: 1-10, 11-20, 21-30
+    // if pageSize=25: 1-25, 26-50, 51-75
+    const pageNum = params.page * params.pageSize + 1;
+    const pageSizeEnd = (params.page + 1) * params.pageSize;
+
     const payload = {
       ruleFromDate: formatDate(params.startDate),
       ruleDateTo: formatDate(params.endDate),
-      pageNum: params.page,
-      pageSize: params.pageSize,
+      pageNum: pageNum,
+      pageSize: pageSizeEnd,
       counter: 0, // Default counter value
       ...(params.ruleName && { ruleName: params.ruleName }),
-      ruleTime: params.runWindow || '',
+      ...(params.runWindow && { ruleTime: params.runWindow }),
     };
 
     const response = await apiClient.post<{
