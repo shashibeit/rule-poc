@@ -36,47 +36,51 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
 }) => {
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, gap: 2 }}>
         <Typography variant="h4">
           Get CG Count and PANs
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={onDownloadExcel}
-            disabled={isExporting || !hasData}
-          >
-            Download Excel
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={onDownloadCSV}
-            disabled={isExporting || !hasData}
-          >
-            Download CSV
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={onDownloadTokenizedPansExcel}
-            disabled={isTokenizedPansLoading || !hasData}
-          >
-            Download Tokenized PANs Excel
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={onDownloadTokenizedPansCSV}
-            disabled={isTokenizedPansLoading || !hasData}
-          >
-            Download Tokenized PANs CSV
-          </Button>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={onDownloadExcel}
+              disabled={isExporting || !hasData}
+            >
+              Download Excel
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={onDownloadCSV}
+              disabled={isExporting || !hasData}
+            >
+              Download CSV
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={onDownloadTokenizedPansExcel}
+              disabled={isTokenizedPansLoading || !hasData}
+            >
+              Download Tokenized PANs Excel
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={onDownloadTokenizedPansCSV}
+              disabled={isTokenizedPansLoading || !hasData}
+            >
+              Download Tokenized PANs CSV
+            </Button>
+          </Box>
         </Box>
       </Box>
 

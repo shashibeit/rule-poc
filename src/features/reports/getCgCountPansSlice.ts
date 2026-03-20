@@ -64,7 +64,7 @@ export const fetchTokenizedPans = createAsyncThunk(
       responseList: TokenizedPanRecord[];
       message: string;
       code: string;
-    }>('/rules/v1/panByCompromiseId', params);
+    }>('/rules/v1/panByCompromiseId', params.compromiseIncidentIds);
 
     return response.responseList || [];
   }
