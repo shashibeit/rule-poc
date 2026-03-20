@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography, Grid } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { withDataGrid, DataGridViewProps } from '@/components/datagrid/withDataGrid';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchCgCountPans, CgCountRecord } from '@/features/reports/getCgCountPansSlice';
+import { fetchCgCountPans, fetchTokenizedPans, CgCountRecord } from '@/features/reports/getCgCountPansSlice';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
@@ -14,7 +14,10 @@ interface GetCgCountPansHeaderProps {
   onSearch: () => void;
   onDownloadExcel: () => void;
   onDownloadCSV: () => void;
+  onDownloadTokenizedPansExcel: () => void;
+  onDownloadTokenizedPansCSV: () => void;
   isExporting: boolean;
+  isTokenizedPansLoading: boolean;
   hasData: boolean;
 }
 
@@ -25,7 +28,10 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
   onSearch,
   onDownloadExcel,
   onDownloadCSV,
+  onDownloadTokenizedPansExcel,
+  onDownloadTokenizedPansCSV,
   isExporting,
+  isTokenizedPansLoading,
   hasData,
 }) => {
   return (
@@ -52,6 +58,24 @@ const GetCgCountPansHeader: FC<GetCgCountPansHeaderProps> = ({
             disabled={isExporting || !hasData}
           >
             Download CSV
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadTokenizedPansExcel}
+            disabled={isTokenizedPansLoading || !hasData}
+          >
+            Download Tokenized PANs Excel
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={onDownloadTokenizedPansCSV}
+            disabled={isTokenizedPansLoading || !hasData}
+          >
+            Download Tokenized PANs CSV
           </Button>
         </Box>
       </Box>
@@ -82,7 +106,9 @@ const GetCgCountPansGrid = withDataGrid<GetCgCountPansHeaderProps>(GetCgCountPan
 
 export const GetCgCountPansPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { records, loading, error } = useAppSelector((state) => state.getCgCountPans);
+  const { records, tokenizedPans, loading, tokenizedPansLoading, error } = useAppSelector(
+    (state) => state.getCgCountPans
+  );
   const [compromiseIncidentId, setCompromiseIncidentId] = useState('');
   const [validationError, setValidationError] = useState<string | undefined>(undefined);
   const [hasApplied, setHasApplied] = useState(false);
@@ -102,7 +128,25 @@ export const GetCgCountPansPage: FC = () => {
     []
   );
 
-  // Excel export hook
+  // Tokenized PANs columns
+  const tokenizedPansColumns = useMemo(
+    () => [
+      { field: 'clientId', headerName: 'Client ID', width: 120 },
+      { field: 'fiName', headerName: 'FI Name', width: 150 },
+      { field: 'compromisedIncidentId', headerName: 'Compromise Incident ID', width: 200 },
+      { field: 'pansAssociated', headerName: 'PANs Associated', width: 200 },
+      { field: 'timestamp', headerName: 'Timestamp', width: 190 },
+    ] as GridColDef[],
+    []
+  );
+
+  // Get unique compromise incident IDs from records
+  const getUniqueCompromiseIncidentIds = (): string[] => {
+    const ids = new Set(records.map((record) => record.compromiseIncidentId));
+    return Array.from(ids);
+  };
+
+  // Excel export hook for main data
   const { exportToExcel, exportToCSV, isExporting } = useExcelExport(
     hasApplied ? records : [],
     columns,
@@ -111,6 +155,33 @@ export const GetCgCountPansPage: FC = () => {
       sheetName: 'CG Count and PANs',
     }
   );
+
+  // Excel export hook for tokenized PANs
+  const { exportToExcel: exportTokenizedPansToExcel, exportToCSV: exportTokenizedPansToCSV } =
+    useExcelExport(tokenizedPans, tokenizedPansColumns, {
+      filename: 'tokenized-pans',
+      sheetName: 'Tokenized PANs',
+    });
+
+  const handleDownloadTokenizedPansExcel = async () => {
+    const compromiseIds = getUniqueCompromiseIncidentIds();
+    if (compromiseIds.length === 0) {
+      return;
+    }
+
+    await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds }));
+    exportTokenizedPansToExcel();
+  };
+
+  const handleDownloadTokenizedPansCSV = async () => {
+    const compromiseIds = getUniqueCompromiseIncidentIds();
+    if (compromiseIds.length === 0) {
+      return;
+    }
+
+    await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds }));
+    exportTokenizedPansToCSV();
+  };
 
   const props: DataGridViewProps = {
     rows: hasApplied ? records : [],
@@ -135,7 +206,10 @@ export const GetCgCountPansPage: FC = () => {
       onCompromiseIncidentIdChange={setCompromiseIncidentId}
       onDownloadExcel={exportToExcel}
       onDownloadCSV={exportToCSV}
+      onDownloadTokenizedPansExcel={handleDownloadTokenizedPansExcel}
+      onDownloadTokenizedPansCSV={handleDownloadTokenizedPansCSV}
       isExporting={isExporting}
+      isTokenizedPansLoading={tokenizedPansLoading}
       hasData={hasApplied && records.length > 0}
       onSearch={() => {
         const trimmed = compromiseIncidentId.trim();

@@ -956,6 +956,36 @@ export function makeServer() {
         };
       });
 
+      this.post('/rules/v1/panByCompromiseId', (_schema, request) => {
+        const body = JSON.parse(request.requestBody || '{}');
+        const { compromiseIncidentIds = [] } = body;
+
+        const allPans = [
+          { clientId: '1001', fiName: 'Alpha FI', compromisedIncidentId: 'A103', pansAssociated: '4111 1111 1111 1111', timestamp: '2026-02-06 10:15 AM' },
+          { clientId: '1001', fiName: 'Alpha FI', compromisedIncidentId: 'A103', pansAssociated: '5555 5555 5555 4444', timestamp: '2026-02-06 10:20 AM' },
+          { clientId: '1002', fiName: 'Beta FI', compromisedIncidentId: 'B102', pansAssociated: '3782 822463 10005', timestamp: '2026-02-06 02:40 PM' },
+          { clientId: '1002', fiName: 'Beta FI', compromisedIncidentId: 'B102', pansAssociated: '6011 1111 1111 1117', timestamp: '2026-02-06 02:45 PM' },
+          { clientId: '1003', fiName: 'Gamma FI', compromisedIncidentId: 'C101', pansAssociated: '3714 496353 98431', timestamp: '2026-02-05 11:05 AM' },
+          { clientId: '1003', fiName: 'Gamma FI', compromisedIncidentId: 'C101', pansAssociated: '4532 1488 0343 6467', timestamp: '2026-02-05 11:10 AM' },
+          { clientId: '1003', fiName: 'Gamma FI', compromisedIncidentId: 'C101', pansAssociated: '5105 1051 0510 5100', timestamp: '2026-02-05 11:15 AM' },
+          { clientId: '1004', fiName: 'Delta FI', compromisedIncidentId: 'D104', pansAssociated: '4111 1111 1111 1111', timestamp: '2026-02-05 09:30 AM' },
+        ];
+
+        let responseList = allPans;
+
+        if (Array.isArray(compromiseIncidentIds) && compromiseIncidentIds.length > 0) {
+          responseList = allPans.filter((pan) =>
+            compromiseIncidentIds.includes(String(pan.compromisedIncidentId))
+          );
+        }
+
+        return {
+          code: 'Success',
+          message: 'Success',
+          responseList,
+        };
+      });
+
       this.post('/rules/v1/getHotListAuditLogs', (_schema, request) => {
         const body = JSON.parse(request.requestBody || '{}');
         const { hotListEntityKeyName = '', hotListName = '' } = body;
@@ -1321,6 +1351,9 @@ export function makeServer() {
             data = data.filter((row) => new Date(row.crteTms) <= end);
           }
         }
+
+        // Sort by created timestamp in ascending order (oldest first)
+        data.sort((a, b) => new Date(a.crteTms).getTime() - new Date(b.crteTms).getTime());
 
         const totalRecordsFiltered = data.length;
         // pageNum is now the start record (1, 11, 21...) and pageSize is the end record (10, 20, 30...)
