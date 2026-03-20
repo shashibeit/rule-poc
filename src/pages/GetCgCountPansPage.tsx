@@ -173,8 +173,12 @@ export const GetCgCountPansPage: FC = () => {
       return;
     }
 
-    await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds }));
-    exportTokenizedPansToExcel();
+    try {
+      await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds })).unwrap();
+      exportTokenizedPansToExcel();
+    } catch (error) {
+      console.error('Failed to fetch tokenized PANs:', error);
+    }
   };
 
   const handleDownloadTokenizedPansCSV = async () => {
@@ -183,8 +187,12 @@ export const GetCgCountPansPage: FC = () => {
       return;
     }
 
-    await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds }));
-    exportTokenizedPansToCSV();
+    try {
+      await dispatch(fetchTokenizedPans({ compromiseIncidentIds: compromiseIds })).unwrap();
+      exportTokenizedPansToCSV();
+    } catch (error) {
+      console.error('Failed to fetch tokenized PANs:', error);
+    }
   };
 
   const props: DataGridViewProps = {

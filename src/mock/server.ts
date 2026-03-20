@@ -957,8 +957,9 @@ export function makeServer() {
       });
 
       this.post('/rules/v1/panByCompromiseId', (_schema, request) => {
-        const body = JSON.parse(request.requestBody || '{}');
-        const { compromiseIncidentIds = [] } = body;
+        const body = JSON.parse(request.requestBody || '[]');
+        // Body is now an array directly: ["B102", "C101", ...]
+        const compromiseIncidentIds = Array.isArray(body) ? body : [];
 
         const allPans = [
           { clientId: '1001', fiName: 'Alpha FI', compromisedIncidentId: 'A103', pansAssociated: '4111 1111 1111 1111', timestamp: '2026-02-06 10:15 AM' },
@@ -973,7 +974,7 @@ export function makeServer() {
 
         let responseList = allPans;
 
-        if (Array.isArray(compromiseIncidentIds) && compromiseIncidentIds.length > 0) {
+        if (compromiseIncidentIds.length > 0) {
           responseList = allPans.filter((pan) =>
             compromiseIncidentIds.includes(String(pan.compromisedIncidentId))
           );

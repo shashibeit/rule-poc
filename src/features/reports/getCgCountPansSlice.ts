@@ -13,6 +13,7 @@ export interface CgCountRecord {
 }
 
 export interface TokenizedPanRecord {
+  id?: string;
   clientId: string;
   fiName: string;
   compromisedIncidentId: string;
@@ -40,6 +41,12 @@ const normalizeRecords = (data?: CgCountRecord[]) =>
   (data ?? []).map((row, index) => ({
     ...row,
     id: row.id ?? `${row.compromiseIncidentId || 'cg'}-${index + 1}`,
+  }));
+
+const normalizeTokenizedPans = (data?: TokenizedPanRecord[]) =>
+  (data ?? []).map((row, index) => ({
+    ...row,
+    id: row.id ?? `${row.compromisedIncidentId || 'pan'}-${index + 1}`,
   }));
 
 export const fetchCgCountPans = createAsyncThunk(
@@ -93,7 +100,7 @@ const getCgCountPansSlice = createSlice({
       })
       .addCase(fetchTokenizedPans.fulfilled, (state, action) => {
         state.tokenizedPansLoading = false;
-        state.tokenizedPans = action.payload;
+        state.tokenizedPans = normalizeTokenizedPans(action.payload);
       })
       .addCase(fetchTokenizedPans.rejected, (state, action) => {
         state.tokenizedPansLoading = false;
